@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:tv_show_explorer/widgets/DetailWidget.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+void main() => runApp(MaterialApp(
+  home:DetailWidget()
+  )
+);
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

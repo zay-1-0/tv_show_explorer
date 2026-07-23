@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 
 import '../classes/show.dart';
+import '../services/databaseService.dart';
 
 class DetailWidget extends StatefulWidget{
 
@@ -18,7 +19,6 @@ class _DetailWidgetState extends State<DetailWidget> {
 
   static late Show show;
   late Future<void> showFuture;
-  bool favorite=false;
 
 
 
@@ -107,10 +107,11 @@ class _DetailWidgetState extends State<DetailWidget> {
                                     child: FloatingActionButton.small(
 
                                       backgroundColor: Colors.white,
-                                      onPressed: (){
-                                        show.isFavorite= !show.isFavorite;
-                                        setState(() {
-                                          favorite=!favorite;
+                                      onPressed: () async {
+                                        Show? showToChange= await Databaseservice.db.shows.get(show.showID);
+                                        showToChange?.isFavorite =showToChange.isFavorite;
+                                        await Databaseservice.db.writeTxn(() async {
+                                          Databaseservice.db.shows.put(showToChange!);
                                         });
                                       },
                                       child: Icon(

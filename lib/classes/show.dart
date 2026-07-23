@@ -2,10 +2,16 @@
 import 'dart:convert';
 
 import 'package:http/http.dart';
+import 'package:isar_community/isar.dart';
+import 'package:tv_show_explorer/services/databaseService.dart';
 
+
+part 'show.g.dart';
+
+@Collection()
 class Show{
 
-  late int showID;
+  late Id showID;
   late String title;
   late String imageURL;
   late String posterURL;
@@ -19,6 +25,8 @@ class Show{
   late String network;
   late String status;
   late int runtime;
+
+  @Index(type: IndexType.value)
   bool isFavorite=false;
 
   Show({required this.showID});
@@ -57,6 +65,14 @@ class Show{
     network=data['network']==null ? 'No Network Data' : data['network']['name'] ?? 'No Network Data';
     status= runTimeEnd==0 ? 'Running' : 'Ended';
     runtime = data['runtime']?? 0;
+
+    if(showID==1 || showID==5 || showID == 8){
+      isFavorite=true;
+    }
+
+    await Databaseservice.db.writeTxn(() async{
+      await Databaseservice.db.shows.put(this);
+    });
 
 
 

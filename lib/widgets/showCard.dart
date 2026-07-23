@@ -1,4 +1,6 @@
+
 import 'package:flutter/material.dart';
+import 'package:tv_show_explorer/services/databaseService.dart';
 
 import '../classes/show.dart';
 
@@ -12,7 +14,7 @@ class showCard extends StatefulWidget {
 
 class _showCardState extends State<showCard> {
 
-  bool favorite=false;
+
 
   @override
   Widget build(BuildContext context) {
@@ -97,10 +99,11 @@ class _showCardState extends State<showCard> {
                   padding: const EdgeInsets.fromLTRB(28, 4, 0, 0),
                   child: FloatingActionButton.small(
                     backgroundColor: Colors.white,
-                    onPressed: (){
-                      widget.currShow.isFavorite= !widget.currShow.isFavorite;
-                      setState(() {
-                        favorite=!favorite;
+                    onPressed: () async {
+                      Show? showToChange= await Databaseservice.db.shows.get(widget.currShow.showID);
+                      showToChange?.isFavorite =!showToChange.isFavorite;
+                      await Databaseservice.db.writeTxn(() async {
+                        Databaseservice.db.shows.put(showToChange!);
                       });
                     },
                     child: Icon(

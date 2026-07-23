@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart';
 
-class Movie{
+class Show{
 
   late int showID;
   late String title;
@@ -19,38 +19,41 @@ class Movie{
   late String network;
   late String status;
   late int runtime;
-  bool loaded=false;
+  bool isFavorite=false;
 
-  Movie({required this.showID});
+  Show({required this.showID});
 
   Future<void> setData() async{
 
-    Uri url=Uri.https('api.tvmaze.com','shows/1');
+    Uri url=Uri.https('api.tvmaze.com','shows/$showID');
     Response response= await get(url);
     Map data= jsonDecode(response.body);
-    
-    Response responseImg=await get(Uri.https('api.tvmaze.com','shows/1/images'));
-    print(responseImg.body);
 
 
 
     title=data['name'];
     imageURL=data['image']['medium'];
     posterURL=data['image']['original'];
-    rating=data['rating']['average'];
+    rating=data['rating']['average'].toDouble();
     runTimeStart=int.parse(data['premiered'].toString().substring(0,4));
     runTimeEnd=   (data['ended'].toString().compareTo('null')==0) ? 0  : int.parse(data['ended'].toString().substring(0,4));
     genres=List<String>.from(data['genres']);
     summary=data['summary'];
     timeOfShowing= data['schedule']['time'];
     daysOfShowing=List<String>.from(data['schedule']['days']);
-    network=data['network']['name'];
+    network=data['network']==null ? 'No Network Data' : data['network']['name'] ?? 'No Network Data';
     status= runTimeEnd==0 ? 'Running' : 'Ended';
-    runtime = data['runtime'];
+    runtime = data['runtime']?? 0;
 
 
 
 
+  }
+
+  @override
+  String toString() {
+
+    return title + showID.toString();
   }
 
 }

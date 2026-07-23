@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 
-import '../classes/Movie.dart';
+import '../classes/show.dart';
 
 class DetailWidget extends StatefulWidget{
 
@@ -14,8 +14,9 @@ class DetailWidget extends StatefulWidget{
 
 class _DetailWidgetState extends State<DetailWidget> {
 
-  static late Movie movie;
-  late Future<void> movieFuture;
+  static late Show show;
+  late Future<void> showFuture;
+  bool favorite=false;
 
 
 
@@ -34,19 +35,18 @@ class _DetailWidgetState extends State<DetailWidget> {
 
   }
 
-  Future<void> setUpMovie() async {
-    Movie currMovie=Movie(showID: 1);
+  Future<void> setUpShow() async {
+    Show currMovie=Show(showID: 1);
     await currMovie.setData();
     setState(() {
-      movie=currMovie;
+      show=currMovie;
     });
   }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    movieFuture = setUpMovie();
+    showFuture = setUpShow();
   }
 
 
@@ -76,48 +76,77 @@ class _DetailWidgetState extends State<DetailWidget> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Image.network(movie.imageURL),
+                    Image.network(show.imageURL),
 
-                    Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(15.0),
-                          child: Text(
-                            movie.title,
-                            style: TextStyle(
-                              fontSize: 15.0,
-                              color: Colors.lime,
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(14, 10, 8, 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                  show.title,
+                                  style: TextStyle(
+                                    fontSize: 15.0,
+                                    color: Colors.lime,
 
-                            ),
+                                  ),
+                                ),
+
+
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(24, 0, 0, 0),
+                                child: SizedBox(
+                                  height: 26,
+                                  width: 26,
+                                  child: FloatingActionButton.small(
+
+                                    backgroundColor: Colors.white,
+                                    onPressed: (){
+                                      show.isFavorite= !show.isFavorite;
+                                      setState(() {
+                                        favorite=!favorite;
+                                      });
+                                    },
+                                    child: Icon(
+                                      Icons.favorite,
+                                      size: 18.0,
+                                      color: show.isFavorite? Colors.red : Colors.black26,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ],
                           ),
-                        ),
 
-                        Row(
-                          children: [
-                            Icon(Icons.star),
-                            Text(
-                              movie.rating.toString(),
+                          Row(
+                            children: [
+                              Icon(Icons.star),
+                              Text(
+                                show.rating.toString(),
 
-                            ),
-                            Icon(Icons.circle, size: 3.0,),
-                            Text(
-                                '${movie.runTimeStart}-${movie.runTimeEnd}'
-                            )
-                          ],
-                        ),
-
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
-                          child: Wrap(
-                            children:
-                            movie.genres.map((genre) => genreCard(genre)).toList(),
-                            spacing: 3,
-                            runSpacing: 10,
-                            direction: Axis.vertical,
+                              ),
+                              Icon(Icons.circle, size: 3.0,),
+                              Text(
+                                  '${show.runTimeStart}-${show.runTimeEnd}'
+                              )
+                            ],
                           ),
-                        )
-                      ],
 
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
+                            child: Wrap(
+                              children:
+                              show.genres.map((genre) => genreCard(genre)).toList(),
+                              spacing: 3,
+                              runSpacing: 10,
+                              direction: Axis.vertical,
+                            ),
+                          )
+                        ],
+
+                      ),
                     )
 
                   ],
@@ -140,7 +169,7 @@ class _DetailWidgetState extends State<DetailWidget> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 15, 15, 10),
                 child: Text(
-                    movie.summary,
+                    show.summary,
                   style: TextStyle(
                     fontSize: 20.0,
                     color: Colors.amber,
@@ -154,26 +183,26 @@ class _DetailWidgetState extends State<DetailWidget> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('${movie.timeOfShowing} on ${movie.daysOfShowing}',
+                    Text('${show.timeOfShowing} on ${show.daysOfShowing}',
                     style: TextStyle(
                       fontSize: 17.0,
                         fontWeight: FontWeight.w500
                       ),
                     ),
                     Icon(Icons.circle,size: 5.0,),
-                    Text(movie.network,
+                    Text(show.network,
                       style: TextStyle(
                           fontSize: 17.0,
                         fontWeight: FontWeight.w500
                       ),),
                     Icon(Icons.circle,size: 5.0,),
-                    Text(movie.status,
+                    Text(show.status,
                       style: TextStyle(
                           fontSize: 17.0,
                           fontWeight: FontWeight.w500
                       ),),
                     Icon(Icons.circle,size: 5.0,),
-                    Text('${movie.runtime.toString()} mins',
+                    Text('${show.runtime.toString()} mins',
                       style: TextStyle(
                           fontSize: 17.0,
                           fontWeight: FontWeight.w500

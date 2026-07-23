@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:tv_show_explorer/widgets/DetailWidget.dart';
+import 'package:tv_show_explorer/widgets/homePage.dart';
 
 void main() => runApp(MaterialApp(
-  home:DetailWidget()
+  home:HomePage()
   )
 );
 

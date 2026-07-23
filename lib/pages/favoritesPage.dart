@@ -9,7 +9,9 @@ import '../widgets/showCard.dart';
 
 class FavoritesPage extends StatefulWidget {
 
-  const FavoritesPage({super.key});
+  final ValueChanged<int> didSelectShow;
+
+  const FavoritesPage({super.key,required this.didSelectShow});
 
   @override
   State<FavoritesPage> createState() => _FavoritesPageState();
@@ -67,7 +69,9 @@ class _FavoritesPageState extends State<FavoritesPage> {
         itemBuilder: (context,index) {
           if(index<favorites.length) {
             final show = favorites[index];
-            return showCard(currShow: show,);
+            return showCard(currShow: show,didSelectShow: (showID) {
+              widget.didSelectShow(showID);
+            },);
 
           }else if(favorites.length==0){
             return Padding(

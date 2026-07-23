@@ -8,7 +8,9 @@ import 'package:tv_show_explorer/widgets/showCard.dart';
 import '../classes/show.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+
+  final ValueChanged<int> didSelectShow;
+  const HomePage({super.key, required this.didSelectShow});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -30,6 +32,8 @@ class _HomePageState extends State<HomePage> {
   late Future<void> showFuture;
   bool isLoaded=false;
   bool isLoading=false;
+
+
 
 
 
@@ -143,7 +147,9 @@ class _HomePageState extends State<HomePage> {
           itemBuilder: (context,index){
             if(index<shows.length) {
               final show = shows[index];
-              return showCard(currShow: show,);
+              return showCard(currShow: show, didSelectShow: (showID){
+                widget.didSelectShow(showID);
+              },);
             }else{
               return Padding(
                 padding: EdgeInsets.all(8),

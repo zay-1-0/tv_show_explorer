@@ -9,7 +9,7 @@ class DetailWidget extends StatefulWidget{
   final int showID;
 
 
-  DetailWidget({super.key, required this.showID});
+  const DetailWidget({super.key, required this.showID});
 
   @override
   State<DetailWidget> createState() => _DetailWidgetState();

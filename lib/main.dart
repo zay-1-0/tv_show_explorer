@@ -33,18 +33,30 @@ enum CurrentPage{
 
 class _MyAppState extends State<MyApp> {
 
+  int _showID=0;
+
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-       home: FavoritesPage()
-      // Navigator(
-      //   pages: [
-      //     MaterialPage(child: HomePage()),
-      //
-      //   ],
-      // ),
+       home: //FavoritesPage()
+      Navigator(
+        pages: [
+          MaterialPage(child: HomePage(didSelectShow: (showID){
+            setState(() {
+              _showID=showID;
+            });
+          },)),
+
+          if(_showID!=0)
+            MaterialPage(child: DetailWidget(showID: _showID))
+        ],
+        onPopPage: (route,result){
+          _showID=0;
+          return route.didPop(result);
+        },
+      ),
     );
   }
 }

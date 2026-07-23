@@ -5,7 +5,7 @@ import '../classes/show.dart';
 
 class DetailWidget extends StatefulWidget{
 
-  int showID;
+  final int showID;
 
 
   DetailWidget({super.key, required this.showID});

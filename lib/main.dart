@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:tv_show_explorer/widgets/DetailWidget.dart';
-import 'package:tv_show_explorer/widgets/homePage.dart';
+import 'package:tv_show_explorer/pages/detailPage.dart';
+import 'package:tv_show_explorer/pages/homePage.dart';
 
 void main() => runApp(MaterialApp(
   home:DetailWidget(showID: 2,)

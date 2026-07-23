@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../classes/show.dart';
 
 class showCard extends StatefulWidget {
-  Show currShow;
+  final Show currShow;
   showCard({super.key, required this.currShow});
 
   @override

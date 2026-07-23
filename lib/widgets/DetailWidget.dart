@@ -5,8 +5,10 @@ import '../classes/show.dart';
 
 class DetailWidget extends StatefulWidget{
 
+  int showID;
 
-  const DetailWidget({super.key});
+
+  DetailWidget({super.key, required this.showID});
 
   @override
   State<DetailWidget> createState() => _DetailWidgetState();
@@ -23,6 +25,7 @@ class _DetailWidgetState extends State<DetailWidget> {
   Widget genreCard(String genre){
 
     return Card(
+      color: Colors.blueGrey,
       child: Text(
         genre,
         style: TextStyle(
@@ -30,13 +33,12 @@ class _DetailWidgetState extends State<DetailWidget> {
           fontSize: 15.0
         ),
       ),
-      color: Colors.blueGrey,
     );
 
   }
 
   Future<void> setUpShow() async {
-    Show currMovie=Show(showID: 1);
+    Show currMovie=Show(showID: widget.showID);
     await currMovie.setData();
     setState(() {
       show=currMovie;
@@ -64,92 +66,95 @@ class _DetailWidgetState extends State<DetailWidget> {
             //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Image.network(
-              //     movie.posterURL,
-              //   scale: 0.5,
-              //
-              // ),
+              Image.network(
+                  height: 200,
+                    show.posterURL,
+                  fit: BoxFit.fill,
+                ),
           
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Image.network(show.imageURL),
+              SizedBox(
+                height: 220,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Image.network(show.imageURL),
 
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(14, 10, 8, 10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Text(
-                                  show.title,
-                                  style: TextStyle(
-                                    fontSize: 15.0,
-                                    color: Colors.lime,
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(14, 10, 8, 10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                    show.title,
+                                    style: TextStyle(
+                                      fontSize: 15.0,
+                                      color: Colors.lime,
 
-                                  ),
-                                ),
-
-
-                              Padding(
-                                padding: const EdgeInsets.fromLTRB(24, 0, 0, 0),
-                                child: SizedBox(
-                                  height: 26,
-                                  width: 26,
-                                  child: FloatingActionButton.small(
-
-                                    backgroundColor: Colors.white,
-                                    onPressed: (){
-                                      show.isFavorite= !show.isFavorite;
-                                      setState(() {
-                                        favorite=!favorite;
-                                      });
-                                    },
-                                    child: Icon(
-                                      Icons.favorite,
-                                      size: 18.0,
-                                      color: show.isFavorite? Colors.red : Colors.black26,
                                     ),
                                   ),
-                                ),
-                              )
-                            ],
-                          ),
 
-                          Row(
-                            children: [
-                              Icon(Icons.star),
-                              Text(
-                                show.rating.toString(),
 
-                              ),
-                              Icon(Icons.circle, size: 3.0,),
-                              Text(
-                                  '${show.runTimeStart}-${show.runTimeEnd}'
-                              )
-                            ],
-                          ),
+                                Padding(
+                                  padding: const EdgeInsets.fromLTRB(24, 0, 0, 0),
+                                  child: SizedBox(
+                                    height: 26,
+                                    width: 26,
+                                    child: FloatingActionButton.small(
 
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
-                            child: Wrap(
-                              children:
-                              show.genres.map((genre) => genreCard(genre)).toList(),
-                              spacing: 3,
-                              runSpacing: 10,
-                              direction: Axis.vertical,
+                                      backgroundColor: Colors.white,
+                                      onPressed: (){
+                                        show.isFavorite= !show.isFavorite;
+                                        setState(() {
+                                          favorite=!favorite;
+                                        });
+                                      },
+                                      child: Icon(
+                                        Icons.favorite,
+                                        size: 18.0,
+                                        color: show.isFavorite? Colors.red : Colors.black26,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              ],
                             ),
-                          )
-                        ],
 
-                      ),
-                    )
+                            Row(
+                              children: [
+                                Icon(Icons.star),
+                                Text(
+                                  show.rating.toString(),
 
-                  ],
+                                ),
+                                Icon(Icons.circle, size: 3.0,),
+                                Text(
+                                    '${show.runTimeStart}-${show.runTimeEnd}'
+                                )
+                              ],
+                            ),
+
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
+                              child: Wrap(
+                                children:
+                                show.genres.map((genre) => genreCard(genre)).toList(),
+                                spacing: 3,
+                                runSpacing: 10,
+                                direction: Axis.vertical,
+                              ),
+                            )
+                          ],
+
+                        ),
+                      )
+
+                    ],
+                  ),
                 ),
               ),
           
@@ -171,7 +176,7 @@ class _DetailWidgetState extends State<DetailWidget> {
                 child: Text(
                     show.summary,
                   style: TextStyle(
-                    fontSize: 20.0,
+                    fontSize: 16.0,
                     color: Colors.amber,
                     fontWeight: FontWeight.w500
                   ),

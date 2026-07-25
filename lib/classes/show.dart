@@ -11,6 +11,7 @@ part 'show.g.dart';
 @Collection()
 class Show{
 
+
   late Id showID;
   late String title;
   late String imageURL;

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:isar_community/isar.dart';
 import 'package:tv_show_explorer/classes/show.dart';
 import 'package:tv_show_explorer/pages/detailPage.dart';
 import 'package:tv_show_explorer/pages/favoritesPage.dart';
@@ -13,8 +14,6 @@ void main() async {
 Future<void> _setup() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Databaseservice.setup();
-  Show(showID: 8).setData();
-  Show(showID: 5).setData();
 }
 
 
@@ -33,13 +32,24 @@ enum CurrentPage{
 
 class _MyAppState extends State<MyApp> {
 
+
   int _showID=0;
   int _selectedPage=0;
   bool _isShowingDetails=false;
 
+  @override
+  void dispose() {
+
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
+
+
+
+
     return MaterialApp(
       title: 'Flutter Demo',
        home: //FavoritesPage()
@@ -66,7 +76,8 @@ class _MyAppState extends State<MyApp> {
                 _showID=showID;
                 _isShowingDetails=true;
               });
-            },)
+            },
+            )
             ),
 
             if(_selectedPage==1)

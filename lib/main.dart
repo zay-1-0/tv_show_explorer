@@ -35,6 +35,7 @@ class _MyAppState extends State<MyApp> {
 
   int _showID=0;
   int _selectedPage=0;
+  bool _isShowingDetails=false;
 
 
   @override
@@ -48,6 +49,7 @@ class _MyAppState extends State<MyApp> {
           onDestinationSelected: (int index){
             setState(() {
               _selectedPage=index;
+              _isShowingDetails=false;
             });
           },
           destinations: [
@@ -59,30 +61,36 @@ class _MyAppState extends State<MyApp> {
         body: Navigator(
           pages: [
             if(_selectedPage==0)
-            MaterialPage(child: HomePage(didSelectShow: (showID){
+            MaterialPage(key: ValueKey('HomePage'),child: HomePage(didSelectShow: (showID){
               setState(() {
                 _showID=showID;
+                _isShowingDetails=true;
               });
             },)
             ),
 
             if(_selectedPage==1)
-              MaterialPage(child: Text('Hey')),
+              MaterialPage(key: ValueKey('SearchPage'), child: Text('Hey')),
 
             if(_selectedPage==2)
-              MaterialPage(child: FavoritesPage(didSelectShow: (showID){
+              MaterialPage(key: ValueKey('FavoritesPage'), child: FavoritesPage(didSelectShow: (showID){
                 setState(() {
                   _showID=showID;
+                  _isShowingDetails=true;
                 });
               },)
               ),
 
-            if(_showID!=0)
-              MaterialPage(child: DetailWidget(showID: _showID))
+            if(_showID!=0 && _isShowingDetails)
+              MaterialPage(key:ValueKey('DetailsPage'),  child: DetailWidget(showID: _showID))
           ],
-          onPopPage: (route,result){
-            _showID=0;
-            return route.didPop(result);
+          onDidRemovePage: (page){
+            if(page.key==const ValueKey('DetailsPage'))
+            {
+              _showID=0;
+              _isShowingDetails=false;
+            }
+
           },
         ),
       ),

@@ -36,6 +36,7 @@ class Show{
 
     Uri url=Uri.https('api.tvmaze.com','shows/$showID');
     Response response= await get(url);
+    print(response.body.runtimeType);
     Map data= jsonDecode(response.body);
 
     Uri posterUrl=Uri.https('api.tvmaze.com', 'shows/$showID/images');
@@ -55,7 +56,7 @@ class Show{
 
     title=data['name'];
     imageURL=data['image']['medium'];
-    rating=data['rating']['average'].toDouble();
+    rating=data['rating']['average']==null ? 0.0 : data['rating']['average'].toDouble()?? 0.0 ;
     runTimeStart=int.parse(data['premiered'].toString().substring(0,4));
     runTimeEnd=   (data['ended'].toString().compareTo('null')==0) ? 0  : int.parse(data['ended'].toString().substring(0,4));
     genres=List<String>.from(data['genres']);

@@ -4,6 +4,7 @@ import 'package:tv_show_explorer/classes/show.dart';
 import 'package:tv_show_explorer/pages/detailPage.dart';
 import 'package:tv_show_explorer/pages/favoritesPage.dart';
 import 'package:tv_show_explorer/pages/homePage.dart';
+import 'package:tv_show_explorer/pages/searchPage.dart';
 import 'package:tv_show_explorer/services/databaseService.dart';
 
 void main() async {
@@ -81,7 +82,12 @@ class _MyAppState extends State<MyApp> {
             ),
 
             if(_selectedPage==1)
-              MaterialPage(key: ValueKey('SearchPage'), child: Text('Hey')),
+              MaterialPage(key: ValueKey('SearchPage'), child: SearchPage(didSelectShow: (showID){
+                setState(() {
+                  _showID=showID;
+                  _isShowingDetails=true;
+                });
+              },)),
 
             if(_selectedPage==2)
               MaterialPage(key: ValueKey('FavoritesPage'), child: FavoritesPage(didSelectShow: (showID){

@@ -7,6 +7,7 @@ import 'package:http/http.dart';
 import 'package:isar_community/isar.dart';
 import 'package:tv_show_explorer/services/databaseService.dart';
 import 'package:tv_show_explorer/widgets/showCard.dart';
+import 'package:tv_show_explorer/widgets/showListView.dart';
 
 
 import '../classes/show.dart';
@@ -32,7 +33,7 @@ class _HomePageState extends State<HomePage> {
   late List<Show> shows=[];
   int id = 0;
   int offset=10;
-  final controller=ScrollController();
+  final scrollController=ScrollController();
   late Future<void> showFuture;
   bool isLoaded=false;
   bool isLoading=false;
@@ -141,8 +142,8 @@ class _HomePageState extends State<HomePage> {
       setUpShows();
     }
     
-    controller.addListener((){
-      if(controller.position.maxScrollExtent==controller.offset){
+    scrollController.addListener((){
+      if(scrollController.position.maxScrollExtent==scrollController.offset){
         addShows();
       }
     });
@@ -153,7 +154,7 @@ class _HomePageState extends State<HomePage> {
   void dispose() {
     showStreamSet?.cancel();
     showStreamAdd?.cancel();
-    controller.dispose();
+    scrollController.dispose();
     super.dispose();
   }
 
@@ -191,23 +192,7 @@ class _HomePageState extends State<HomePage> {
             return const Center(child: Text('Shows Loading. Please wait :)'));
           }
 
-          return ListView.builder(
-              controller: controller,
-              itemCount: shows.length+1,
-              itemBuilder: (context,index){
-                if(index<shows.length) {
-                  final show =  shows[index];
-                  return showCard(currShow: show, didSelectShow: (showID){
-                    widget.didSelectShow(showID);
-                  },);
-                }else{
-                  return Padding(
-                    padding: EdgeInsets.all(8),
-                    child: Center(child: CircularProgressIndicator(),),
-                  );
-                }
-              },
-          );
+          return ShowListView(shows: shows, scrollController: scrollController, didSelectShow: widget.didSelectShow,isSearch: false,);
         }
       ),
     );

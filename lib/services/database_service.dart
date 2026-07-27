@@ -2,7 +2,7 @@ import 'package:isar_community/isar.dart';
 import 'package:path_provider/path_provider.dart';
 import '../classes/show.dart';
 
-class Databaseservice {
+class DatabaseService {
 
   static late final Isar db;
 

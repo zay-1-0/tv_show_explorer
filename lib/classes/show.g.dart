@@ -38,31 +38,26 @@ const ShowSchema = CollectionSchema(
       type: IsarType.bool,
     ),
     r'network': PropertySchema(id: 4, name: r'network', type: IsarType.string),
-    r'posterURL': PropertySchema(
-      id: 5,
-      name: r'posterURL',
-      type: IsarType.string,
-    ),
-    r'rating': PropertySchema(id: 6, name: r'rating', type: IsarType.double),
+    r'rating': PropertySchema(id: 5, name: r'rating', type: IsarType.double),
     r'runTimeEnd': PropertySchema(
-      id: 7,
+      id: 6,
       name: r'runTimeEnd',
       type: IsarType.long,
     ),
     r'runTimeStart': PropertySchema(
-      id: 8,
+      id: 7,
       name: r'runTimeStart',
       type: IsarType.long,
     ),
-    r'runtime': PropertySchema(id: 9, name: r'runtime', type: IsarType.long),
-    r'status': PropertySchema(id: 10, name: r'status', type: IsarType.string),
-    r'summary': PropertySchema(id: 11, name: r'summary', type: IsarType.string),
+    r'runtime': PropertySchema(id: 8, name: r'runtime', type: IsarType.long),
+    r'status': PropertySchema(id: 9, name: r'status', type: IsarType.string),
+    r'summary': PropertySchema(id: 10, name: r'summary', type: IsarType.string),
     r'timeOfShowing': PropertySchema(
-      id: 12,
+      id: 11,
       name: r'timeOfShowing',
       type: IsarType.string,
     ),
-    r'title': PropertySchema(id: 13, name: r'title', type: IsarType.string),
+    r'title': PropertySchema(id: 12, name: r'title', type: IsarType.string),
   },
 
   estimateSize: _showEstimateSize,
@@ -116,7 +111,6 @@ int _showEstimateSize(
   }
   bytesCount += 3 + object.imageURL.length * 3;
   bytesCount += 3 + object.network.length * 3;
-  bytesCount += 3 + object.posterURL.length * 3;
   bytesCount += 3 + object.status.length * 3;
   bytesCount += 3 + object.summary.length * 3;
   bytesCount += 3 + object.timeOfShowing.length * 3;
@@ -135,15 +129,14 @@ void _showSerialize(
   writer.writeString(offsets[2], object.imageURL);
   writer.writeBool(offsets[3], object.isFavorite);
   writer.writeString(offsets[4], object.network);
-  writer.writeString(offsets[5], object.posterURL);
-  writer.writeDouble(offsets[6], object.rating);
-  writer.writeLong(offsets[7], object.runTimeEnd);
-  writer.writeLong(offsets[8], object.runTimeStart);
-  writer.writeLong(offsets[9], object.runtime);
-  writer.writeString(offsets[10], object.status);
-  writer.writeString(offsets[11], object.summary);
-  writer.writeString(offsets[12], object.timeOfShowing);
-  writer.writeString(offsets[13], object.title);
+  writer.writeDouble(offsets[5], object.rating);
+  writer.writeLong(offsets[6], object.runTimeEnd);
+  writer.writeLong(offsets[7], object.runTimeStart);
+  writer.writeLong(offsets[8], object.runtime);
+  writer.writeString(offsets[9], object.status);
+  writer.writeString(offsets[10], object.summary);
+  writer.writeString(offsets[11], object.timeOfShowing);
+  writer.writeString(offsets[12], object.title);
 }
 
 Show _showDeserialize(
@@ -152,21 +145,22 @@ Show _showDeserialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  final object = Show(showID: id);
-  object.daysOfShowing = reader.readStringList(offsets[0]) ?? [];
-  object.genres = reader.readStringList(offsets[1]) ?? [];
-  object.imageURL = reader.readString(offsets[2]);
+  final object = Show(
+    daysOfShowing: reader.readStringList(offsets[0]) ?? [],
+    genres: reader.readStringList(offsets[1]) ?? [],
+    imageURL: reader.readString(offsets[2]),
+    network: reader.readString(offsets[4]),
+    rating: reader.readDouble(offsets[5]),
+    runTimeEnd: reader.readLong(offsets[6]),
+    runTimeStart: reader.readLong(offsets[7]),
+    runtime: reader.readLong(offsets[8]),
+    showID: id,
+    status: reader.readString(offsets[9]),
+    summary: reader.readString(offsets[10]),
+    timeOfShowing: reader.readString(offsets[11]),
+    title: reader.readString(offsets[12]),
+  );
   object.isFavorite = reader.readBool(offsets[3]);
-  object.network = reader.readString(offsets[4]);
-  object.posterURL = reader.readString(offsets[5]);
-  object.rating = reader.readDouble(offsets[6]);
-  object.runTimeEnd = reader.readLong(offsets[7]);
-  object.runTimeStart = reader.readLong(offsets[8]);
-  object.runtime = reader.readLong(offsets[9]);
-  object.status = reader.readString(offsets[10]);
-  object.summary = reader.readString(offsets[11]);
-  object.timeOfShowing = reader.readString(offsets[12]);
-  object.title = reader.readString(offsets[13]);
   return object;
 }
 
@@ -188,22 +182,20 @@ P _showDeserializeProp<P>(
     case 4:
       return (reader.readString(offset)) as P;
     case 5:
-      return (reader.readString(offset)) as P;
-    case 6:
       return (reader.readDouble(offset)) as P;
+    case 6:
+      return (reader.readLong(offset)) as P;
     case 7:
       return (reader.readLong(offset)) as P;
     case 8:
       return (reader.readLong(offset)) as P;
     case 9:
-      return (reader.readLong(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 10:
       return (reader.readString(offset)) as P;
     case 11:
       return (reader.readString(offset)) as P;
     case 12:
-      return (reader.readString(offset)) as P;
-    case 13:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -218,9 +210,7 @@ List<IsarLinkBase<dynamic>> _showGetLinks(Show object) {
   return [];
 }
 
-void _showAttach(IsarCollection<dynamic> col, Id id, Show object) {
-  object.showID = id;
-}
+void _showAttach(IsarCollection<dynamic> col, Id id, Show object) {}
 
 extension ShowQueryWhereSort on QueryBuilder<Show, Show, QWhere> {
   QueryBuilder<Show, Show, QAfterWhere> anyShowID() {
@@ -1064,152 +1054,6 @@ extension ShowQueryFilter on QueryBuilder<Show, Show, QFilterCondition> {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.greaterThan(property: r'network', value: ''),
-      );
-    });
-  }
-
-  QueryBuilder<Show, Show, QAfterFilterCondition> posterURLEqualTo(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(
-          property: r'posterURL',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<Show, Show, QAfterFilterCondition> posterURLGreaterThan(
-    String value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(
-          include: include,
-          property: r'posterURL',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<Show, Show, QAfterFilterCondition> posterURLLessThan(
-    String value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'posterURL',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<Show, Show, QAfterFilterCondition> posterURLBetween(
-    String lower,
-    String upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.between(
-          property: r'posterURL',
-          lower: lower,
-          includeLower: includeLower,
-          upper: upper,
-          includeUpper: includeUpper,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<Show, Show, QAfterFilterCondition> posterURLStartsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.startsWith(
-          property: r'posterURL',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<Show, Show, QAfterFilterCondition> posterURLEndsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.endsWith(
-          property: r'posterURL',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<Show, Show, QAfterFilterCondition> posterURLContains(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.contains(
-          property: r'posterURL',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<Show, Show, QAfterFilterCondition> posterURLMatches(
-    String pattern, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.matches(
-          property: r'posterURL',
-          wildcard: pattern,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<Show, Show, QAfterFilterCondition> posterURLIsEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'posterURL', value: ''),
-      );
-    });
-  }
-
-  QueryBuilder<Show, Show, QAfterFilterCondition> posterURLIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(property: r'posterURL', value: ''),
       );
     });
   }
@@ -2144,18 +1988,6 @@ extension ShowQuerySortBy on QueryBuilder<Show, Show, QSortBy> {
     });
   }
 
-  QueryBuilder<Show, Show, QAfterSortBy> sortByPosterURL() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'posterURL', Sort.asc);
-    });
-  }
-
-  QueryBuilder<Show, Show, QAfterSortBy> sortByPosterURLDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'posterURL', Sort.desc);
-    });
-  }
-
   QueryBuilder<Show, Show, QAfterSortBy> sortByRating() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'rating', Sort.asc);
@@ -2287,18 +2119,6 @@ extension ShowQuerySortThenBy on QueryBuilder<Show, Show, QSortThenBy> {
   QueryBuilder<Show, Show, QAfterSortBy> thenByNetworkDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'network', Sort.desc);
-    });
-  }
-
-  QueryBuilder<Show, Show, QAfterSortBy> thenByPosterURL() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'posterURL', Sort.asc);
-    });
-  }
-
-  QueryBuilder<Show, Show, QAfterSortBy> thenByPosterURLDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'posterURL', Sort.desc);
     });
   }
 
@@ -2446,14 +2266,6 @@ extension ShowQueryWhereDistinct on QueryBuilder<Show, Show, QDistinct> {
     });
   }
 
-  QueryBuilder<Show, Show, QDistinct> distinctByPosterURL({
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'posterURL', caseSensitive: caseSensitive);
-    });
-  }
-
   QueryBuilder<Show, Show, QDistinct> distinctByRating() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'rating');
@@ -2548,12 +2360,6 @@ extension ShowQueryProperty on QueryBuilder<Show, Show, QQueryProperty> {
   QueryBuilder<Show, String, QQueryOperations> networkProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'network');
-    });
-  }
-
-  QueryBuilder<Show, String, QQueryOperations> posterURLProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'posterURL');
     });
   }
 

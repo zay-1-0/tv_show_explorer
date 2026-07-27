@@ -5,9 +5,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:isar_community/isar.dart';
-import 'package:tv_show_explorer/services/databaseService.dart';
-import 'package:tv_show_explorer/widgets/showCard.dart';
-import 'package:tv_show_explorer/widgets/showListView.dart';
+import 'package:tv_show_explorer/services/api_service.dart';
+import 'package:tv_show_explorer/services/database_service.dart';
+import 'package:tv_show_explorer/widgets/show_card.dart';
+import 'package:tv_show_explorer/widgets/show_list_view.dart';
 
 
 import '../classes/show.dart';
@@ -15,7 +16,9 @@ import '../classes/show.dart';
 class HomePage extends StatefulWidget {
 
   final ValueChanged<int> didSelectShow;
-  const HomePage({super.key, required this.didSelectShow});
+  final ApiService apiService;
+
+  const HomePage({super.key, required this.didSelectShow, required this.apiService});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -33,6 +36,7 @@ class _HomePageState extends State<HomePage> {
   late List<Show> shows=[];
   int id = 0;
   int offset=10;
+  int currentPageNumber=0;
   final scrollController=ScrollController();
   late Future<void> showFuture;
   bool isLoaded=false;
@@ -48,31 +52,37 @@ class _HomePageState extends State<HomePage> {
 
 
   Future<void> setUpShows() async{
+
     if(isLoading)return;
 
-    await Databaseservice.db.writeTxn(() async{
-      await Databaseservice.db.shows.clear();
+    await DatabaseService.db.writeTxn(() async{
+      await DatabaseService.db.shows.clear();
     });
 
 
 
-    for(int count=0 ; count<offset ; count++) {
+    // for(int count=0 ; count<offset ; count++) {
+    //
+    //   Map? data = await widget.apiService.fetchShow(id);
+    //
+    //   if (data!=null) {
+    //
+    //     Show toAdd=Show.fromJson(data);
+    //
+    //   }else{
+    //     count--;
+    //   }
+    //     id++;
+    //
+    //
+    // }
 
-      Uri url = Uri.https('api.tvmaze.com', 'shows/$id');
-      Response response = await get(url);
+    final List<dynamic>? searchResults=await widget.apiService.fetchResultsbyPage(currentPageNumber++);
 
-      if (response.statusCode == 200) {
-        Show toAdd=Show(showID: id);
-        await toAdd.setData();
-
-      }else{
-        count--;
-      }
-      setState(() {
-        id++;
-      });
-
-    }
+    final showsResults = searchResults?.map((map)=>Show.fromJson(map['show'])).toList();
+    setState(() {
+      shows=showsResults??[];
+    });
 
 
 
@@ -93,24 +103,12 @@ class _HomePageState extends State<HomePage> {
 
 
 
-    for(int count=0 ; count<offset ; count++) {
+    final List<dynamic>? searchResults=await widget.apiService.fetchResultsbyPage(currentPageNumber++);
 
-      Uri url = Uri.https('api.tvmaze.com', 'shows/$id');
-      Response response = await get(url);
-
-      if (response.statusCode == 200) {
-        Show toAdd=Show(showID: id);
-        await toAdd.setData();
-
-      }else{
-        count--;
-      }
-
-      setState(() {
-        id++;
-      });
-
-    }
+    final showsResults = searchResults?.map((map)=>Show.fromJson(map['show'])).toList();
+    setState(() {
+      shows=showsResults??[];
+    });
 
     isLoading=false;
 
@@ -147,7 +145,7 @@ class _HomePageState extends State<HomePage> {
         addShows();
       }
     });
-    _builderShowStream= Databaseservice.db.shows.where().watch(fireImmediately: true);
+    _builderShowStream= DatabaseService.db.shows.where().watch(fireImmediately: true);
   }
 
   @override

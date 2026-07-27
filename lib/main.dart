@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:isar_community/isar.dart';
 import 'package:tv_show_explorer/classes/show.dart';
-import 'package:tv_show_explorer/pages/detailPage.dart';
-import 'package:tv_show_explorer/pages/favoritesPage.dart';
-import 'package:tv_show_explorer/pages/homePage.dart';
-import 'package:tv_show_explorer/pages/searchPage.dart';
-import 'package:tv_show_explorer/services/databaseService.dart';
+import 'package:tv_show_explorer/pages/detail_page.dart';
+import 'package:tv_show_explorer/pages/favorites_page.dart';
+import 'package:tv_show_explorer/pages/home_page.dart';
+import 'package:tv_show_explorer/pages/search_page.dart';
+import 'package:tv_show_explorer/services/database_service.dart';
 
 void main() async {
   await _setup();
@@ -14,7 +14,7 @@ void main() async {
 
 Future<void> _setup() async{
   WidgetsFlutterBinding.ensureInitialized();
-  await Databaseservice.setup();
+  await DatabaseService.setup();
 }
 
 
@@ -25,16 +25,10 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-enum CurrentPage{
-  HomePage,
-  SearchPage,
-  FavoritesPage,
-}
-
 class _MyAppState extends State<MyApp> {
 
 
-  int _showID=0;
+  int? _showID;
   int _selectedPage=0;
   bool _isShowingDetails=false;
 
@@ -98,13 +92,13 @@ class _MyAppState extends State<MyApp> {
               },)
               ),
 
-            if(_showID!=0 && _isShowingDetails)
-              MaterialPage(key:ValueKey('DetailsPage'),  child: DetailWidget(showID: _showID))
+            if(_showID!=null && _isShowingDetails)
+              MaterialPage(key:ValueKey('DetailsPage'),  child: DetailWidget(showID: _showID!))
           ],
           onDidRemovePage: (page){
             if(page.key==const ValueKey('DetailsPage'))
             {
-              _showID=0;
+              _showID=null;
               _isShowingDetails=false;
             }
 

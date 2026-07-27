@@ -5,7 +5,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:tv_show_explorer/classes/show.dart';
-import 'package:tv_show_explorer/widgets/showListView.dart';
+import 'package:tv_show_explorer/widgets/show_list_view.dart';
 
 class SearchPage extends StatefulWidget {
   final ValueChanged<int> didSelectShow;
@@ -37,24 +37,17 @@ class _SearchPageState extends State<SearchPage> {
          query=_searchQuery.text.toString().toLowerCase();
         Uri url=Uri.https('api.tvmaze.com','search/shows',{'q' : query});
         Response response= await get(url);
-         RegExp regex = RegExp(r'"id"\s*:\s*(\d+)\s*,\s*"url"');
-         Iterable<Match> matches = regex.allMatches(response.body);
-         List<int> ids = matches.map((m) => int.parse(m.group(1)!)).toList();
+        final results = jsonDecode(response.body) as List;
+        final shows = results.map((r) => Show.fromJson(r['show'])).toList();
+        setState(() => _showResults = shows);
 
-         ids.forEach((id){
 
-           Show toAdd=Show(showID: id);
-           toAdd.setData();
-           showsRetrieved.add(toAdd);
-
-         });
 
 
 
 
 
         setState(() {
-          _testResult=query;
           _showResults=showsRetrieved;
           _searchText=query;
         });

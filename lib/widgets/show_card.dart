@@ -1,21 +1,14 @@
 
 import 'package:flutter/material.dart';
-import 'package:tv_show_explorer/services/databaseService.dart';
+import 'package:tv_show_explorer/services/database_service.dart';
 
 import '../classes/show.dart';
 
-class showCard extends StatefulWidget {
+class ShowCard extends StatelessWidget
+{
   final Show currShow;
   final ValueChanged<int> didSelectShow;
-  const showCard({super.key, required this.currShow, required this.didSelectShow});
-
-  @override
-  State<showCard> createState() => _showCardState();
-}
-
-class _showCardState extends State<showCard> {
-
-
+  const ShowCard({super.key, required this.currShow, required this.didSelectShow});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +18,7 @@ class _showCardState extends State<showCard> {
       height: 280,
       //width:430,
       child: InkWell(
-        onTap: () => widget.didSelectShow(widget.currShow.showID) ,
+        onTap: () => didSelectShow(currShow.showID) ,
         child: Card(
             color: Colors.black12,
             child: Padding(padding: const EdgeInsets.all(8.0),
@@ -42,7 +35,7 @@ class _showCardState extends State<showCard> {
                           maxWidth: 180,
                         ),
                         child: Image.network(
-                          widget.currShow.imageURL,
+                          currShow.imageURL,
                         ),
                       ),
 
@@ -54,7 +47,7 @@ class _showCardState extends State<showCard> {
                             SizedBox(
                               width: 130,
                               child: Text(
-                                '${widget.currShow.title} - ${widget.currShow.showID}',
+                                '${currShow.title} - ${currShow.showID}',
                                 style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w400,
@@ -74,7 +67,7 @@ class _showCardState extends State<showCard> {
                                 ),
 
                                 Text(
-                                  widget.currShow.rating.toString(),
+                                  currShow.rating.toString(),
                                   style: TextStyle(
                                       fontSize: 20,
                                       color: Colors.amberAccent,
@@ -103,16 +96,16 @@ class _showCardState extends State<showCard> {
                     child: FloatingActionButton.small(
                       backgroundColor: Colors.white,
                       onPressed: () async {
-                        Show? showToChange= await Databaseservice.db.shows.get(widget.currShow.showID);
+                        Show? showToChange= await DatabaseService.db.shows.get(currShow.showID);
                         showToChange?.isFavorite =!showToChange.isFavorite;
-                        await Databaseservice.db.writeTxn(() async {
-                          Databaseservice.db.shows.put(showToChange!);
+                        await DatabaseService.db.writeTxn(() async {
+                          DatabaseService.db.shows.put(showToChange!);
                         });
                       },
                       child: Icon(
                         Icons.favorite,
                         size: 25.0,
-                        color:widget.currShow.isFavorite? Colors.red : Colors.black26,
+                        color:currShow.isFavorite? Colors.red : Colors.black26,
                       ),
                     ),
                   )

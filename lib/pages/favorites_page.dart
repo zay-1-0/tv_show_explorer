@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:isar_community/isar.dart';
-import 'package:tv_show_explorer/services/databaseService.dart';
+import 'package:tv_show_explorer/services/database_service.dart';
 
 import '../classes/show.dart';
-import '../widgets/showCard.dart';
+import '../widgets/show_card.dart';
 
 class FavoritesPage extends StatefulWidget {
 
@@ -28,7 +28,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
   @override
   void initState() {
     super.initState();
-    showStream= Databaseservice.db.shows.buildQuery<Show>(
+    showStream= DatabaseService.db.shows.buildQuery<Show>(
       whereClauses: [
         IndexWhereClause.equalTo(
           indexName: 'isFavorite', value: [true],
@@ -69,7 +69,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
         itemBuilder: (context,index) {
           if(index<favorites.length) {
             final show = favorites[index];
-            return showCard(currShow: show,didSelectShow: (showID) {
+            return ShowCard(currShow: show,didSelectShow: (showID) {
               widget.didSelectShow(showID);
             },);
 

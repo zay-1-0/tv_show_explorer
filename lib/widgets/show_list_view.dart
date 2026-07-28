@@ -7,7 +7,7 @@ class ShowListView extends StatelessWidget {
 
   final ScrollController scrollController;
   final List<Show> shows;
-  final ValueChanged<int> didSelectShow;
+  final ValueChanged<Show> didSelectShow;
   final bool isSearch;
 
 
@@ -23,16 +23,18 @@ class ShowListView extends StatelessWidget {
       itemBuilder: (context,index){
         if(index<shows.length) {
           final show =  shows[index];
-          return ShowCard(currShow: show, didSelectShow: (showID){
-            didSelectShow(showID);
+          return ShowCard(currShow: show, didSelectShow: (selectedShow){
+            didSelectShow(selectedShow);
           },);
         }else if(!isSearch){
           return Padding(
             padding: EdgeInsets.all(8),
             child: Center(child: CircularProgressIndicator(),),
           );
+        }else{
+          return const SizedBox.shrink();
         }
       },
-    );;
+    );
   }
 }

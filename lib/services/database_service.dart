@@ -17,4 +17,14 @@ class DatabaseService {
       directory: appDir.path,
     );
   }
+
+  static Future<void> putShowsinDatabase(List<Show> showsToAdd) async {
+
+    await DatabaseService.db.writeTxn(() async {
+      showsToAdd.forEach((show)=> db.shows.put(show));
+    });
+  }
+
+
+
 }

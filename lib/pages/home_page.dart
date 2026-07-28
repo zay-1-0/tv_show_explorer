@@ -3,11 +3,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
-import 'package:isar_community/isar.dart';
+
 import 'package:tv_show_explorer/services/api_service.dart';
 import 'package:tv_show_explorer/services/database_service.dart';
-import 'package:tv_show_explorer/widgets/show_card.dart';
+
 import 'package:tv_show_explorer/widgets/show_list_view.dart';
 
 
@@ -15,7 +14,7 @@ import '../classes/show.dart';
 
 class HomePage extends StatefulWidget {
 
-  final ValueChanged<int> didSelectShow;
+  final ValueChanged<Show> didSelectShow;
   final ApiService apiService;
 
   const HomePage({super.key, required this.didSelectShow, required this.apiService});
@@ -44,10 +43,6 @@ class _HomePageState extends State<HomePage> {
   StreamSubscription? showStreamSet;
   StreamSubscription? showStreamAdd;
 
-  late Stream<List<Show>> _builderShowStream;
-
-
-
 
 
 
@@ -55,40 +50,19 @@ class _HomePageState extends State<HomePage> {
 
     if(isLoading)return;
 
-    await DatabaseService.db.writeTxn(() async{
-      await DatabaseService.db.shows.clear();
-    });
+    final List<dynamic>? pageResults=await widget.apiService.fetchResultsbyPage(currentPageNumber++);
 
-
-
-    // for(int count=0 ; count<offset ; count++) {
-    //
-    //   Map? data = await widget.apiService.fetchShow(id);
-    //
-    //   if (data!=null) {
-    //
-    //     Show toAdd=Show.fromJson(data);
-    //
-    //   }else{
-    //     count--;
-    //   }
-    //     id++;
-    //
-    //
-    // }
-
-    final List<dynamic>? searchResults=await widget.apiService.fetchResultsbyPage(currentPageNumber++);
-
-    final showsResults = searchResults?.map((map)=>Show.fromJson(map['show'])).toList();
+    final showsResults = pageResults?.map((map)=>Show.fromJson(map)).toList();
     setState(() {
       shows=showsResults??[];
     });
+
+    await DatabaseService.putShowsinDatabase(shows);
 
 
 
 
     isLoaded=true;
-    //print(shows);
 
   }
 
@@ -99,29 +73,16 @@ class _HomePageState extends State<HomePage> {
 
     isLoading=true;
 
-    //int alreadyLoaded=shows.length;
-
-
-
     final List<dynamic>? searchResults=await widget.apiService.fetchResultsbyPage(currentPageNumber++);
 
-    final showsResults = searchResults?.map((map)=>Show.fromJson(map['show'])).toList();
+    final showsResults = searchResults?.map((map)=>Show.fromJson(map)).toList();
     setState(() {
       shows=showsResults??[];
     });
 
     isLoading=false;
 
-    // List<Show> newShows=[];
-    // showStreamAdd= Databaseservice.db.shows.buildQuery<Show>(
-    //
-    //
-    // ).watch(fireImmediately: true,).listen( (data) {
-    //     newShows=data;
-    // } );
-
-
-
+    await DatabaseService.putShowsinDatabase(shows);
 
 
   }
@@ -145,7 +106,6 @@ class _HomePageState extends State<HomePage> {
         addShows();
       }
     });
-    _builderShowStream= DatabaseService.db.shows.where().watch(fireImmediately: true);
   }
 
   @override
@@ -175,30 +135,10 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      body: StreamBuilder<List<Show>>(
-        stream: _builderShowStream,
-        builder: (context, asyncSnapshot) {
-
-          if (asyncSnapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          shows = asyncSnapshot.data ?? [];
+      body: ShowListView(shows: shows, scrollController: scrollController, didSelectShow: widget.didSelectShow,isSearch: false,)
 
 
-          if (shows.isEmpty) {
-            return const Center(child: Text('Shows Loading. Please wait :)'));
-          }
-
-          return ShowListView(shows: shows, scrollController: scrollController, didSelectShow: widget.didSelectShow,isSearch: false,);
-        }
-      ),
     );
   }
 }
 
-
-//ListView.builder(itemBuilder: (context,index){
-//         final Show show=shows[index];
-//
-//       }),

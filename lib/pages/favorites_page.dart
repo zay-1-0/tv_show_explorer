@@ -9,7 +9,7 @@ import '../widgets/show_card.dart';
 
 class FavoritesPage extends StatefulWidget {
 
-  final ValueChanged<int> didSelectShow;
+  final ValueChanged<Show> didSelectShow;
 
   const FavoritesPage({super.key,required this.didSelectShow});
 
@@ -65,12 +65,12 @@ class _FavoritesPageState extends State<FavoritesPage> {
       ),
       body: ListView.builder(
         controller: controller,
-        itemCount: favorites.length+1,
+        itemCount: favorites.isEmpty ? 1 : favorites.length,
         itemBuilder: (context,index) {
           if(index<favorites.length) {
             final show = favorites[index];
-            return ShowCard(currShow: show,didSelectShow: (showID) {
-              widget.didSelectShow(showID);
+            return ShowCard(currShow: show,didSelectShow: (selectedShow) {
+              widget.didSelectShow(selectedShow);
             },);
 
           }else if(favorites.length==0){
@@ -78,6 +78,8 @@ class _FavoritesPageState extends State<FavoritesPage> {
               padding: EdgeInsets.all(8),
               child: Center(child: Text('No Favorites. Go to Home or Search Page to find some'),),
             );
+          }else{
+            return const SizedBox.shrink();
           }
         },
       ),

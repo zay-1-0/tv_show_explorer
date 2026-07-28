@@ -1,15 +1,18 @@
 
 import 'package:flutter/material.dart';
+import 'package:tv_show_explorer/widgets/favorite_button.dart';
 
 import '../classes/show.dart';
+import '../services/api_service.dart';
 import '../services/database_service.dart';
 
 class DetailWidget extends StatefulWidget{
 
-  final int showID;
+  final int showId;
+  final ApiService apiService;
 
 
-  const DetailWidget({super.key, required this.showID});
+  const DetailWidget({super.key, required this.showId, required this.apiService});
 
   @override
   State<DetailWidget> createState() => _DetailWidgetState();
@@ -17,8 +20,9 @@ class DetailWidget extends StatefulWidget{
 
 class _DetailWidgetState extends State<DetailWidget> {
 
-  late Show show;
-  late Future<void> showFuture;
+  bool _isLoading=true;
+  late Show? show;
+
 
 
 
@@ -37,18 +41,41 @@ class _DetailWidgetState extends State<DetailWidget> {
 
   }
 
-  Future<void> setUpShow() async {
-    Show currMovie=Show(showID: widget.showID);
-    await currMovie.setData();
-    setState(() {
-      show=currMovie;
-    });
-  }
+
 
   @override
   void initState() {
     super.initState();
-    showFuture = setUpShow();
+    _loadShow();
+  }
+
+  Future<void> _loadShow() async {
+    // Load show from database
+    show = await DatabaseService.db.shows.get(widget.showId);
+
+    if (show == null) return;
+
+    // Fetch poster if needed
+    if (show!.posterURL.isEmpty) {
+      final url = await widget.apiService.fetchPosterUrl(widget.showId);
+
+      if (url != null) {
+        show!.posterURL = url;
+
+        await DatabaseService.db.writeTxn(() async {
+          await DatabaseService.db.shows.put(show!);
+        });
+      }
+    }
+
+    // Reload from database so we have the updated posterURL
+    show = await DatabaseService.db.shows.get(widget.showId);
+
+    if (!mounted) return;
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
 
@@ -58,36 +85,36 @@ class _DetailWidgetState extends State<DetailWidget> {
   Widget build(BuildContext context) {
 
 
+    if (_isLoading || show == null) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+    final currentShow = show!;
 
         return Scaffold(
           appBar:AppBar(title: Text('Show Details'),) ,
           backgroundColor: Colors.lightBlue[900],
-          body: FutureBuilder(
-            future: showFuture,
-            builder: (context, asyncSnapshot) {
-              if (asyncSnapshot.connectionState != ConnectionState.done) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              return Column(
-                //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            body: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Image.network(
                       height: 200,
-                        show.posterURL,
+                        currentShow.posterURL,
                       fit: BoxFit.fill,
                     ),
 
-                  SizedBox(
-                    height: 220,
+                  ConstrainedBox(
+                    constraints: BoxConstraints(maxHeight: 230),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Image.network(show.imageURL),
+                          Image.network(currentShow.imageURL),
 
                           Padding(
                             padding: const EdgeInsets.fromLTRB(14, 10, 8, 10),
@@ -97,7 +124,7 @@ class _DetailWidgetState extends State<DetailWidget> {
                                 Row(
                                   children: [
                                     Text(
-                                        show.title,
+                                        currentShow.title,
                                         style: TextStyle(
                                           fontSize: 15.0,
                                           color: Colors.lime,
@@ -107,27 +134,9 @@ class _DetailWidgetState extends State<DetailWidget> {
 
 
                                     Padding(
-                                      padding: const EdgeInsets.fromLTRB(24, 0, 0, 0),
-                                      child: SizedBox(
-                                        height: 26,
-                                        width: 26,
-                                        child: FloatingActionButton.small(
+                                      padding: const EdgeInsets.fromLTRB(70, 0, 0, 0),
+                                      child: FavoriteButton(showId: currentShow.showID, isDetails: true,),
 
-                                          backgroundColor: Colors.white,
-                                          onPressed: () async {
-                                            Show? showToChange= await DatabaseService.db.shows.get(show.showID);
-                                            showToChange?.isFavorite =! showToChange.isFavorite;
-                                            await DatabaseService.db.writeTxn(() async {
-                                              DatabaseService.db.shows.put(showToChange!);
-                                            });
-                                          },
-                                          child: Icon(
-                                            Icons.favorite,
-                                            size: 18.0,
-                                            color: show.isFavorite? Colors.red : Colors.black26,
-                                          ),
-                                        ),
-                                      ),
                                     )
                                   ],
                                 ),
@@ -136,12 +145,12 @@ class _DetailWidgetState extends State<DetailWidget> {
                                   children: [
                                     Icon(Icons.star),
                                     Text(
-                                      show.rating.toString(),
+                                      currentShow.rating.toString(),
 
                                     ),
                                     Icon(Icons.circle, size: 3.0,),
                                     Text(
-                                        '${show.runTimeStart}-${show.runTimeEnd}'
+                                        '${currentShow.runTimeStart}-${currentShow.runTimeEnd}'
                                     )
                                   ],
                                 ),
@@ -150,7 +159,7 @@ class _DetailWidgetState extends State<DetailWidget> {
                                   padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
                                   child: Wrap(
                                     children:
-                                    show.genres.map((genre) => genreCard(genre)).toList(),
+                                    currentShow.genres.map((genre) => genreCard(genre)).toList(),
                                     spacing: 3,
                                     runSpacing: 10,
                                     direction: Axis.vertical,
@@ -179,49 +188,39 @@ class _DetailWidgetState extends State<DetailWidget> {
 
                   ),
 
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 15, 15, 10),
-                    child: Text(
-                        show.summary,
-                      style: TextStyle(
-                        fontSize: 16.0,
-                        color: Colors.amber,
-                        fontWeight: FontWeight.w500
+                  SizedBox(
+                    height: 240,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 15, 15, 10),
+                      child: SingleChildScrollView(
+                        child: Text(
+                            currentShow.summary,
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            color: Colors.amber,
+                            fontWeight: FontWeight.w500
+                          ),
+                        ),
                       ),
                     ),
                   ),
 
-                  Padding(
-                    padding: const EdgeInsets.all(30.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('${show.timeOfShowing} on ${show.daysOfShowing}',
-                        style: TextStyle(
-                          fontSize: 17.0,
-                            fontWeight: FontWeight.w500
+                  ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxHeight: 100
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(30.0),
+                      child:
+                          Text(
+                            '${currentShow.timeOfShowing} on ${currentShow.daysOfShowing} ● ${currentShow.network} ● ${currentShow.status} ● ${currentShow.runtime.toString()} mins',
+                          style: TextStyle(
+                            fontSize: 17.0,
+                              fontWeight: FontWeight.w500
+                            ),
                           ),
-                        ),
-                        Icon(Icons.circle,size: 5.0,),
-                        Text(show.network,
-                          style: TextStyle(
-                              fontSize: 17.0,
-                            fontWeight: FontWeight.w500
-                          ),),
-                        Icon(Icons.circle,size: 5.0,),
-                        Text(show.status,
-                          style: TextStyle(
-                              fontSize: 17.0,
-                              fontWeight: FontWeight.w500
-                          ),),
-                        Icon(Icons.circle,size: 5.0,),
-                        Text('${show.runtime.toString()} mins',
-                          style: TextStyle(
-                              fontSize: 17.0,
-                              fontWeight: FontWeight.w500
-                          ),)
 
-                      ],
+
                     ),
                   )
 
@@ -230,9 +229,8 @@ class _DetailWidgetState extends State<DetailWidget> {
 
                 ],
 
-              );
-            }
-          ),
+              )
+
         );
   }
 }

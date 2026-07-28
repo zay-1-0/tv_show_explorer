@@ -1,15 +1,20 @@
 
 import 'dart:async';
-import 'dart:convert';
+
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
+
 import 'package:tv_show_explorer/classes/show.dart';
+import 'package:tv_show_explorer/services/api_service.dart';
 import 'package:tv_show_explorer/widgets/show_list_view.dart';
 
+import '../services/database_service.dart';
+
 class SearchPage extends StatefulWidget {
-  final ValueChanged<int> didSelectShow;
-  const SearchPage({super.key, required this.didSelectShow});
+  final ValueChanged<Show> didSelectShow;
+  final ApiService apiService;
+  const SearchPage({super.key, required this.didSelectShow, required this.apiService});
+
 
   @override
   State<SearchPage> createState() => _SearchPageState();
@@ -20,14 +25,12 @@ class _SearchPageState extends State<SearchPage> {
   final scrollController=ScrollController();
   TextEditingController _searchQuery= TextEditingController();
   Timer? _debounce;
-  late String _testResult='';
   String _searchText='';
   List<Show> _showResults=[];
 
 
   Future<void> _onSearchChanged() async {
     String query;
-    List<Show> showsRetrieved=[];
 
     if(_debounce?.isActive?? false)_debounce?.cancel();
     _debounce=Timer(const Duration(milliseconds: 400),
@@ -35,20 +38,13 @@ class _SearchPageState extends State<SearchPage> {
       if(_searchQuery.text!=_searchText && _searchQuery.text.length>=2){
 
          query=_searchQuery.text.toString().toLowerCase();
-        Uri url=Uri.https('api.tvmaze.com','search/shows',{'q' : query});
-        Response response= await get(url);
-        final results = jsonDecode(response.body) as List;
-        final shows = results.map((r) => Show.fromJson(r['show'])).toList();
+
+        final results = await widget.apiService.fetchSearchResults(query);
+        final shows = results?.map((r) => Show.fromJson(r['show'])).toList()??[];
+        await DatabaseService.putShowsinDatabase(shows);
         setState(() => _showResults = shows);
 
-
-
-
-
-
-
         setState(() {
-          _showResults=showsRetrieved;
           _searchText=query;
         });
       }
@@ -85,7 +81,6 @@ class _SearchPageState extends State<SearchPage> {
       ),
 
       body: Container(
-        margin: EdgeInsets.all(10.0),
         child: Column(
           children: [
             TextField(
@@ -108,16 +103,16 @@ class _SearchPageState extends State<SearchPage> {
 
 
             ),
-            if(_showResults.length==0)
+            if(_showResults.isEmpty)
               Text(
-                  'No Reults',
+                  'No Results',
                 style: TextStyle(
                   fontSize: 20,
                   color: Colors.blueGrey,
                   fontWeight: FontWeight.w400,
                 ),
               )
-            else if(_showResults.length>0)
+            else if(_showResults.isNotEmpty)
               Expanded(
                   child: ShowListView(shows: _showResults, scrollController: scrollController, didSelectShow: widget.didSelectShow,isSearch: true,)
               )

@@ -77,7 +77,9 @@ class _HomePageState extends State<HomePage> {
 
     final showsResults = searchResults?.map((map)=>Show.fromJson(map)).toList();
     setState(() {
-      shows=showsResults??[];
+      setState(() {
+        shows = [...shows, ...?showsResults];
+      });;
     });
 
     isLoading=false;

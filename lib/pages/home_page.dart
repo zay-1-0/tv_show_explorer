@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:tv_show_explorer/classes/home_page_data.dart';
 import 'package:tv_show_explorer/controllers/home_page_controller.dart';
 
@@ -72,7 +73,10 @@ class _HomePageState extends ConsumerState<HomePage> {
           ),
         ),
       ),
-      body: ShowListView(shows: _homePageData.shows, scrollController: scrollController,isHome: true,)
+      body: Skeletonizer(
+          enabled: !_homePageData.isLoading,
+          child: ShowListView(shows: _homePageData.shows, scrollController: scrollController,isHome: true,)
+      )
 
 
     );

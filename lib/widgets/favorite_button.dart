@@ -37,7 +37,7 @@ class FavoriteButton extends ConsumerWidget {
 
         return IconButton.filled(
           style: IconButton.styleFrom(
-            backgroundColor: Colors.white,
+            backgroundColor: Colors.indigoAccent,
           ),
 
           onPressed: () async {
@@ -48,7 +48,7 @@ class FavoriteButton extends ConsumerWidget {
           icon: Icon(
             Icons.favorite,
             size: 25,
-            color: show.isFavorite ? Colors.red : Colors.black26,
+            color: show.isFavorite ? Colors.red : Colors.black38,
           ),
         );
 

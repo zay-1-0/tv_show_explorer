@@ -1,8 +1,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:tv_show_explorer/providers/detail_page_provider.dart';
 import 'package:tv_show_explorer/widgets/favorite_button.dart';
+
+import '../classes/show.dart';
 
 
 class DetailWidget extends ConsumerWidget{
@@ -19,11 +22,14 @@ class DetailWidget extends ConsumerWidget{
 
     return Card(
       color: Colors.blueGrey,
-      child: Text(
-        genre,
-        style: TextStyle(
-          color: Colors.red,
-          fontSize: 15.0
+      child: Padding(
+        padding: const EdgeInsets.all(6.0),
+        child: Text(
+          genre,
+          style: TextStyle(
+            color: Colors.black87,
+            fontSize: 15.0
+          ),
         ),
       ),
     );
@@ -47,26 +53,37 @@ class DetailWidget extends ConsumerWidget{
     final show = ref.watch(detailPageShowProvider(showId));
 
     return show.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: ()  {
+        return detailPage(context, null, true);
+      },
       error: (err, stack) => Center(child: Text('Error fetching details: $err')),
       data: (currentShow){
 
-        if(currentShow==null){
-          return Text('Error occurred, show is null');
-        }
+       return detailPage(context, currentShow, false);
+
+      }
+    );
 
 
+  }
 
-        return Scaffold(
-          appBar: AppBar(
-            title: const Text('Show Details'),
-          ),
-          backgroundColor: Colors.lightBlue[900],
-          body: Column(
+  Widget detailPage(
+      BuildContext context,
+      Show? currentShow,
+      bool isLoading,
+      ){
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text('Show Details'),
+        ),
+        backgroundColor: Colors.lightBlue[900],
+        body: Skeletonizer(
+          enabled: isLoading,
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Image.network(
-                currentShow.posterURL,
+                currentShow?.posterURL??'',
                 height: 200,
                 fit: BoxFit.cover,
                 errorBuilder: (context, exception, stackTrace) {
@@ -84,86 +101,99 @@ class DetailWidget extends ConsumerWidget{
               ),
 
               Padding(
-                padding: const EdgeInsets.all(8),
-                child: SizedBox(
+                padding: const EdgeInsets.all(2),
+                child: Container(
                   height: MediaQuery.sizeOf(context).height*0.243,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Image.network(
-                        currentShow.imageURL,
-                        errorBuilder: (context, error, stackTrace) {
-                          return const SizedBox(
-                            width: 120,
-                            child: Center(
-                              child: Icon(Icons.broken_image, size: 50),
-                            ),
-                          );
-                        },
-                      ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(2.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Image.network(
+                          currentShow?.imageURL??'',
+                          errorBuilder: (context, error, stackTrace) {
+                            return const SizedBox(
+                              width: 120,
+                              child: Center(
+                                child: Icon(Icons.broken_image, size: 50),
+                              ),
+                            );
+                          },
+                        ),
 
-                      const SizedBox(width: 14),
+                        const SizedBox(width: 14),
 
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      currentShow.title,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                        color: Colors.lime,
-                                        fontWeight: FontWeight.bold,
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        currentShow?.title??'',
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          fontSize: 26,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w500,
+                                        ),
                                       ),
                                     ),
+
+                                    const SizedBox(width: 8),
+
+                                    FavoriteButton(
+                                      showId: currentShow?.showID??0,
+                                    ),
+                                  ],
+                                ),
+
+                                const SizedBox(height: 10),
+
+                                Row(
+                                  children: [
+                                    const Icon(Icons.star),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      currentShow?.rating.toString()??'',
+                                      style: TextStyle(
+                                          fontSize: 18
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    const Icon(Icons.circle, size: 10),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      '${currentShow?.runTimeStart??''} - ${currentShow?.runTimeEnd??''}',
+                                      style: TextStyle(
+                                          fontSize: 18
+                                      ),
+                                    ),
+                                  ],
+                                ),
+
+                                const SizedBox(height: 12),
+
+                                Expanded(
+                                  child: Wrap(
+                                    spacing: 6,
+                                    runSpacing: 6,
+                                    children: currentShow?.genres
+                                        .map((genre) => genreCard(genre))
+                                        .toList()??[],
                                   ),
-
-                                  const SizedBox(width: 8),
-
-                                  FavoriteButton(
-                                    showId: currentShow.showID,
-                                  ),
-                                ],
-                              ),
-
-                              const SizedBox(height: 10),
-
-                              Row(
-                                children: [
-                                  const Icon(Icons.star),
-                                  const SizedBox(width: 4),
-                                  Text(currentShow.rating.toString()),
-                                  const SizedBox(width: 8),
-                                  const Icon(Icons.circle, size: 4),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    '${currentShow.runTimeStart} - ${currentShow.runTimeEnd}',
-                                  ),
-                                ],
-                              ),
-
-                              const SizedBox(height: 12),
-
-                              Wrap(
-                                spacing: 6,
-                                runSpacing: 6,
-                                children: currentShow.genres
-                                    .map((genre) => genreCard(genre))
-                                    .toList(),
-                              ),
-                            ],
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -176,7 +206,7 @@ class DetailWidget extends ConsumerWidget{
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 20,
-                    color: Colors.amber,
+                    color: Colors.white60,
                   ),
                 ),
               ),
@@ -186,10 +216,10 @@ class DetailWidget extends ConsumerWidget{
                   padding: const EdgeInsets.fromLTRB(20, 15, 20, 10),
                   child: SingleChildScrollView(
                     child: Text(
-                      currentShow.summary,
+                      currentShow?.summary??'',
                       style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.amber,
+                        fontSize: 20,
+                        color: Colors.white70,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -200,10 +230,10 @@ class DetailWidget extends ConsumerWidget{
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal:24),
                 child: Text(
-                  '${currentShow.timeOfShowing} on ${currentShow.daysOfShowing} ● '
-                      '${currentShow.network} ● '
-                      '${currentShow.status} ● '
-                      '${currentShow.runtime} mins',
+                  '${currentShow?.timeOfShowing??''} on ${currentShow?.daysOfShowing??''} ● '
+                      '${currentShow?.network??''} ● '
+                      '${currentShow?.status??''} ● '
+                      '${currentShow?.runtime??''} mins',
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 17,
@@ -216,11 +246,8 @@ class DetailWidget extends ConsumerWidget{
 
             ],
           ),
-        );
-
-      }
-    );
-
+        ),
+      );
 
   }
 }

@@ -21,9 +21,11 @@ class HomePageController extends StateNotifier<HomePageData>{
 
   Future<void> loadShows() async{
 
+    state=state.copyWith(isLoading: true);
+
     final List<dynamic>? pageResults=await _apiService.fetchResultsbyPage(state.pageNumber);
     final List<Show>? showsResults = pageResults?.map((map)=>Show.fromJson(map)).toList();
-    state=state.shows.isEmpty ?  state.copyWith(showsResults??[], (state.pageNumber+1))   :  state.copyWith([...state.shows, ...showsResults??[]], (state.pageNumber+1));
+    state=state.shows.isEmpty ?  state.copyWith(data:  showsResults??[], newPageNum: (state.pageNumber+1))   :  state.copyWith(data: [...state.shows, ...showsResults??[]], newPageNum: (state.pageNumber+1),isLoading: false);
     await _databaseService.putShowsinDatabase(state.shows);
 
   }

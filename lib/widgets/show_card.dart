@@ -22,7 +22,7 @@ class ShowCard extends ConsumerWidget
             ref.read(selectedShowProvider.notifier).selectNewShow(currShow);
         },
         child: Card(
-          color: Colors.black12,
+          color: Colors.indigoAccent[100],
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
@@ -55,7 +55,7 @@ class ShowCard extends ConsumerWidget
                         Text(
                           currShow.title,
                           style: const TextStyle(
-                            fontSize: 15,
+                            fontSize: 20,
                             fontWeight: FontWeight.w400,
                           ),
                           maxLines: 4,

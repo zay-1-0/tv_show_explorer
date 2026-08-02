@@ -1,27 +1,16 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tv_show_explorer/providers/detail_page_provider.dart';
 import 'package:tv_show_explorer/widgets/favorite_button.dart';
 
-import '../classes/show.dart';
-import '../services/api_service.dart';
-import '../services/database_service.dart';
 
-class DetailWidget extends StatefulWidget{
+class DetailWidget extends ConsumerWidget{
 
   final int showId;
-  final ApiService apiService;
 
 
-  const DetailWidget({super.key, required this.showId, required this.apiService});
-
-  @override
-  State<DetailWidget> createState() => _DetailWidgetState();
-}
-
-class _DetailWidgetState extends State<DetailWidget> {
-
-  bool _isLoading=true;
-  late Show? show;
+  const DetailWidget({super.key, required this.showId,});
 
 
 
@@ -43,194 +32,195 @@ class _DetailWidgetState extends State<DetailWidget> {
 
 
 
-  @override
-  void initState() {
-    super.initState();
-    _loadShow();
-  }
 
-  Future<void> _loadShow() async {
-    // Load show from database
-    show = await DatabaseService.db.shows.get(widget.showId);
 
-    if (show == null) return;
 
-    // Fetch poster if needed
-    if (show!.posterURL.isEmpty) {
-      final url = await widget.apiService.fetchPosterUrl(widget.showId);
-
-      if (url != null) {
-        show!.posterURL = url;
-
-        await DatabaseService.db.writeTxn(() async {
-          await DatabaseService.db.shows.put(show!);
-        });
-      }
-    }
-
-    // Reload from database so we have the updated posterURL
-    show = await DatabaseService.db.shows.get(widget.showId);
-
-    if (!mounted) return;
-
-    setState(() {
-      _isLoading = false;
-    });
-  }
 
 
 
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
 
 
-    if (_isLoading || show == null) {
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
-    final currentShow = show!;
+
+    final show = ref.watch(detailPageShowProvider(showId));
+
+    return show.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (err, stack) => Center(child: Text('Error fetching details: $err')),
+      data: (currentShow){
+
+        if(currentShow==null){
+          return Text('Error occurred, show is null');
+        }
+
+
 
         return Scaffold(
-          appBar:AppBar(title: Text('Show Details'),) ,
+          appBar: AppBar(
+            title: const Text('Show Details'),
+          ),
           backgroundColor: Colors.lightBlue[900],
-            body: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Image.network(
-                      height: 200,
-                        currentShow.posterURL,
-                      fit: BoxFit.fill,
+          body: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Image.network(
+                currentShow.posterURL,
+                height: 200,
+                fit: BoxFit.cover,
+                errorBuilder: (context, exception, stackTrace) {
+                  return const SizedBox(
+                    height: 200,
+                    child: Center(
+                      child: Icon(
+                        Icons.broken_image,
+                        color: Colors.red,
+                        size: 50,
+                      ),
                     ),
+                  );
+                },
+              ),
 
-                  ConstrainedBox(
-                    constraints: BoxConstraints(maxHeight: 230),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Image.network(currentShow.imageURL),
+              Padding(
+                padding: const EdgeInsets.all(8),
+                child: SizedBox(
+                  height: MediaQuery.sizeOf(context).height*0.243,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Image.network(
+                        currentShow.imageURL,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const SizedBox(
+                            width: 120,
+                            child: Center(
+                              child: Icon(Icons.broken_image, size: 50),
+                            ),
+                          );
+                        },
+                      ),
 
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(14, 10, 8, 10),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                        currentShow.title,
-                                        style: TextStyle(
-                                          fontSize: 15.0,
-                                          color: Colors.lime,
+                      const SizedBox(width: 14),
 
-                                        ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      currentShow.title,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        color: Colors.lime,
+                                        fontWeight: FontWeight.bold,
                                       ),
-
-
-                                    Padding(
-                                      padding: const EdgeInsets.fromLTRB(70, 0, 0, 0),
-                                      child: FavoriteButton(showId: currentShow.showID, isDetails: true,),
-
-                                    )
-                                  ],
-                                ),
-
-                                Row(
-                                  children: [
-                                    Icon(Icons.star),
-                                    Text(
-                                      currentShow.rating.toString(),
-
                                     ),
-                                    Icon(Icons.circle, size: 3.0,),
-                                    Text(
-                                        '${currentShow.runTimeStart}-${currentShow.runTimeEnd}'
-                                    )
-                                  ],
-                                ),
-
-                                Padding(
-                                  padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
-                                  child: Wrap(
-                                    children:
-                                    currentShow.genres.map((genre) => genreCard(genre)).toList(),
-                                    spacing: 3,
-                                    runSpacing: 10,
-                                    direction: Axis.vertical,
                                   ),
-                                )
-                              ],
 
-                            ),
-                          )
+                                  const SizedBox(width: 8),
 
-                        ],
+                                  FavoriteButton(
+                                    showId: currentShow.showID,
+                                  ),
+                                ],
+                              ),
+
+                              const SizedBox(height: 10),
+
+                              Row(
+                                children: [
+                                  const Icon(Icons.star),
+                                  const SizedBox(width: 4),
+                                  Text(currentShow.rating.toString()),
+                                  const SizedBox(width: 8),
+                                  const Icon(Icons.circle, size: 4),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    '${currentShow.runTimeStart} - ${currentShow.runTimeEnd}',
+                                  ),
+                                ],
+                              ),
+
+                              const SizedBox(height: 12),
+
+                              Wrap(
+                                spacing: 6,
+                                runSpacing: 6,
+                                children: currentShow.genres
+                                    .map((genre) => genreCard(genre))
+                                    .toList(),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
+                ),
+              ),
 
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(10, 18, 10, 0),
+              const Padding(
+                padding: EdgeInsets.only(top: 18),
+                child: Text(
+                  'Summary',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: Colors.amber,
+                  ),
+                ),
+              ),
+
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 15, 20, 10),
+                  child: SingleChildScrollView(
                     child: Text(
-                        'Summary',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20.0,
-                            color: Colors.amber
-                        ),
-                      ),
-
-                  ),
-
-                  SizedBox(
-                    height: 240,
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 15, 15, 10),
-                      child: SingleChildScrollView(
-                        child: Text(
-                            currentShow.summary,
-                          style: TextStyle(
-                            fontSize: 16.0,
-                            color: Colors.amber,
-                            fontWeight: FontWeight.w500
-                          ),
-                        ),
+                      currentShow.summary,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.amber,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
+                ),
+              ),
 
-                  ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxHeight: 100
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(30.0),
-                      child:
-                          Text(
-                            '${currentShow.timeOfShowing} on ${currentShow.daysOfShowing} ● ${currentShow.network} ● ${currentShow.status} ● ${currentShow.runtime.toString()} mins',
-                          style: TextStyle(
-                            fontSize: 17.0,
-                              fontWeight: FontWeight.w500
-                            ),
-                          ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal:24),
+                child: Text(
+                  '${currentShow.timeOfShowing} on ${currentShow.daysOfShowing} ● '
+                      '${currentShow.network} ● '
+                      '${currentShow.status} ● '
+                      '${currentShow.runtime} mins',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
 
+              const SizedBox(height: 50,),
 
-                    ),
-                  )
-
-
-
-
-                ],
-
-              )
-
+            ],
+          ),
         );
+
+      }
+    );
+
+
   }
 }

@@ -1,31 +1,37 @@
 
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get_it/get_it.dart';
 
 import '../classes/show.dart';
 import '../services/database_service.dart';
 
-class FavoriteButton extends StatelessWidget {
+final showProvider = StreamProvider.family<Show?, int>((ref, showId) {
+  final databaseService = GetIt.instance.get<DatabaseService>();
+  return databaseService.getShowStream(showId);
+});
+
+class FavoriteButton extends ConsumerWidget {
   final int showId;
-  final bool isDetails;
+
 
   const FavoriteButton({
     super.key,
     required this.showId,
-    required this.isDetails,
   });
 
   @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<Show?>(
-      stream: DatabaseService.db.shows.watchObject(
-        showId,
-        fireImmediately: true,
-      ),
-      builder: (context, snapshot) {
-        final show = snapshot.data;
+  Widget build(BuildContext context, WidgetRef ref) {
 
-        if (show == null) {
+
+    final showAsync = ref.watch(showProvider(showId));
+
+    return showAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (err, stack) => Center(child: Text('Error searching: $err')),
+      data: (show){
+        if(show==null){
           return const SizedBox.shrink();
         }
 
@@ -35,10 +41,9 @@ class FavoriteButton extends StatelessWidget {
           ),
 
           onPressed: () async {
-            await DatabaseService.db.writeTxn(() async {
-              show.isFavorite = !show.isFavorite;
-              await DatabaseService.db.shows.put(show);
-            });
+            show.isFavorite = !show.isFavorite;
+            final databaseService=GetIt.instance.get<DatabaseService>();
+            databaseService.putShowinDatabase(show);
           },
           icon: Icon(
             Icons.favorite,
@@ -46,7 +51,10 @@ class FavoriteButton extends StatelessWidget {
             color: show.isFavorite ? Colors.red : Colors.black26,
           ),
         );
-      },
+
+
+      }
     );
+
   }
 }

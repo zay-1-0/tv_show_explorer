@@ -5,14 +5,15 @@ import '../classes/show.dart';
 
 class ShowListView extends StatelessWidget {
 
-  final ScrollController scrollController;
+  final ScrollController? scrollController;
   final List<Show> shows;
-  final ValueChanged<Show> didSelectShow;
-  final bool isSearch;
+  final bool? isSearch;
+  final bool? isHome;
+  final bool? isFavorites;
 
 
 
-  const ShowListView({super.key,required this.shows, required this.scrollController, required this.didSelectShow, required this.isSearch});
+  const ShowListView({super.key,required this.shows, this.scrollController, this.isSearch, this.isFavorites, this.isHome});
 
   @override
   Widget build(BuildContext context) {
@@ -23,10 +24,8 @@ class ShowListView extends StatelessWidget {
       itemBuilder: (context,index){
         if(index<shows.length) {
           final show =  shows[index];
-          return ShowCard(currShow: show, didSelectShow: (selectedShow){
-            didSelectShow(selectedShow);
-          },);
-        }else if(!isSearch){
+          return ShowCard(currShow: show,);
+        }else if(isHome??false){
           return Padding(
             padding: EdgeInsets.all(8),
             child: Center(child: CircularProgressIndicator(),),

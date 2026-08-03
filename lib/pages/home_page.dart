@@ -2,10 +2,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:tv_show_explorer/classes/home_page_data.dart';
 import 'package:tv_show_explorer/controllers/home_page_controller.dart';
+
+import '../classes/show.dart';
 
 
 import 'package:tv_show_explorer/widgets/show_list_view.dart';
@@ -13,10 +14,8 @@ import 'package:tv_show_explorer/widgets/show_list_view.dart';
 
 
 
-final homePageControllerProvider = StateNotifierProvider<HomePageController, HomePageData>((ref){
-  return HomePageController(
-    HomePageData(shows: [], pageNumber: 0),
-  );
+final homePageControllerProvider = AsyncNotifierProvider<HomePageController, HomePageData>((){
+  return HomePageController();
 });
 
 class HomePage extends ConsumerStatefulWidget {
@@ -33,7 +32,7 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   final scrollController=ScrollController();
   late HomePageController _homePageController;
-  late HomePageData _homePageData;
+  late AsyncValue<HomePageData> _homePageData;
 
 
   @override
@@ -46,6 +45,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         _homePageController.loadShows();
       }
     });
+
   }
 
   @override
@@ -61,25 +61,38 @@ class _HomePageState extends ConsumerState<HomePage> {
     _homePageData=ref.watch(homePageControllerProvider);
 
 
+    return _homePageData.when(
+      loading: () =>  homePageWidget(true, [], scrollController),
+      error: (err, stack) => Center(child: Text('Error fetching details: $err')),
+      data: (shows)=> homePageWidget(false, shows.shows, scrollController)
+    );
 
+  }
+
+  Widget homePageWidget(
+      bool isLoading,
+      List<Show> shows,
+      ScrollController scrollController
+      ){
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blue,
-        title: Text(
-          'Home — Popular Shows',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 28.0,
+        appBar: AppBar(
+          backgroundColor: Colors.blue,
+          title: Text(
+            'Home — Popular Shows',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 28.0,
+            ),
           ),
         ),
-      ),
-      body: Skeletonizer(
-          enabled: !_homePageData.isLoading,
-          child: ShowListView(shows: _homePageData.shows, scrollController: scrollController,isHome: true,)
-      )
+        body: Skeletonizer(
+            enabled: isLoading,
+            child: ShowListView(shows: shows, scrollController: scrollController,isHome: true,)
+        )
 
 
     );
+
   }
 }
 

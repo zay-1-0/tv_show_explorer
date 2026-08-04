@@ -4,6 +4,8 @@ import 'package:http/http.dart';
 
 class ApiService {
 
+  ApiService();
+
   static const String baseUrl='api.tvmaze.com';
 
 

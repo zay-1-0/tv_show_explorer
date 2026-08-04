@@ -6,7 +6,8 @@ class DatabaseService {
 
   static late final Isar db;
 
-  static Future<void> setup() async{
+
+  Future<DatabaseService> setup() async{
 
 
     final appDir= await getApplicationDocumentsDirectory();
@@ -16,15 +17,57 @@ class DatabaseService {
       ],
       directory: appDir.path,
     );
+    return this;
   }
 
-  static Future<void> putShowsinDatabase(List<Show> showsToAdd) async {
+  Future<void> putShowinDatabase(Show show) async {
 
     await DatabaseService.db.writeTxn(() async {
-      showsToAdd.forEach((show)=> db.shows.put(show));
+      db.shows.put(show);
+    });
+
+  }
+
+  Future<Show?> getShowFromDatabase(int showId) async{
+
+    return await db.shows.get(showId);
+
+  }
+
+
+  Future<void> putShowsinDatabase(List<Show> showsToAdd) async {
+
+    final List<Id> incomingIds = showsToAdd.map((show) => show.showID).toList();
+
+    final List<Show?> existingShows = await db.shows.getAll(incomingIds);
+
+    final Set<Id> existingIds = existingShows
+        .where((show) => show != null)
+        .map((show) => show!.showID)
+        .toSet();
+
+    final List<Show> showsToInsert = showsToAdd
+        .where((show) => !existingIds.contains(show.showID))
+        .toList();
+
+    await DatabaseService.db.writeTxn(() async {
+      db.shows.putAll(showsToInsert);
     });
   }
 
+  Stream<List<Show>> getFavoritesStream(){
+
+    return db.shows
+        .filter().isFavoriteEqualTo(true)
+        .watch(fireImmediately: true);
+  }
+
+  Stream<Show?> getShowStream(int showId){
+    return db.shows.watchObject(
+      showId,
+      fireImmediately: true,
+    );
+  }
 
 
 }

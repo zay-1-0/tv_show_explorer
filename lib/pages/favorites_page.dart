@@ -1,88 +1,43 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:isar_community/isar.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get_it/get_it.dart';
 import 'package:tv_show_explorer/services/database_service.dart';
+import 'package:tv_show_explorer/widgets/show_list_view.dart';
 
 import '../classes/show.dart';
-import '../widgets/show_card.dart';
 
-class FavoritesPage extends StatefulWidget {
 
-  final ValueChanged<Show> didSelectShow;
+final favoritesProvider = StreamProvider<List<Show>>((ref) {
+  final databaseService=GetIt.instance.get<DatabaseService>();
+  return databaseService.getFavoritesStream();
+});
 
-  const FavoritesPage({super.key,required this.didSelectShow});
+class FavoritesPage extends ConsumerWidget {
+
+
+  const FavoritesPage({super.key,});
+
 
   @override
-  State<FavoritesPage> createState() => _FavoritesPageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ref.watch(favoritesProvider).when(
+      data: (shows) => Scaffold(
 
-class _FavoritesPageState extends State<FavoritesPage> {
-
-  final controller=ScrollController();
-
-  List<Show> favorites=[];
-
-  StreamSubscription? showStream;
-
-  @override
-  void initState() {
-    super.initState();
-    showStream= DatabaseService.db.shows.buildQuery<Show>(
-      whereClauses: [
-        IndexWhereClause.equalTo(
-          indexName: 'isFavorite', value: [true],
-        )
-      ],
-
-
-    ).watch(fireImmediately: true,).listen( (data) {
-      setState(() {
-        favorites=data;
-      });
-    } );
-
-
-
-  }
-@override
-  void dispose() {
-    showStream?.cancel();
-    super.dispose();
-  }
-  @override
-  Widget build(BuildContext context) {
-    return  Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blue,
-        title: Text(
-          'Favorites',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 28.0,
+        appBar: AppBar(
+          backgroundColor: Colors.blue,
+          title: Text(
+            'Favorites Page',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 28.0,
+            ),
           ),
         ),
-      ),
-      body: ListView.builder(
-        controller: controller,
-        itemCount: favorites.isEmpty ? 1 : favorites.length,
-        itemBuilder: (context,index) {
-          if(index<favorites.length) {
-            final show = favorites[index];
-            return ShowCard(currShow: show,didSelectShow: (selectedShow) {
-              widget.didSelectShow(selectedShow);
-            },);
+          body: ShowListView(shows: shows, isFavorites: true),
 
-          }else if(favorites.length==0){
-            return Padding(
-              padding: EdgeInsets.all(8),
-              child: Center(child: Text('No Favorites. Go to Home or Search Page to find some'),),
-            );
-          }else{
-            return const SizedBox.shrink();
-          }
-        },
       ),
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => const Text('Something went wrong'),
     );
   }
 }

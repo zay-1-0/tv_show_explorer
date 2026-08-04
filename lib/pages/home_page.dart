@@ -1,146 +1,98 @@
 
 
-import 'dart:async';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:skeletonizer/skeletonizer.dart';
+import 'package:tv_show_explorer/classes/home_page_data.dart';
+import 'package:tv_show_explorer/controllers/home_page_controller.dart';
 
-import 'package:tv_show_explorer/services/api_service.dart';
-import 'package:tv_show_explorer/services/database_service.dart';
+import '../classes/show.dart';
+
 
 import 'package:tv_show_explorer/widgets/show_list_view.dart';
 
 
-import '../classes/show.dart';
 
-class HomePage extends StatefulWidget {
 
-  final ValueChanged<Show> didSelectShow;
-  final ApiService apiService;
+final homePageControllerProvider = AsyncNotifierProvider<HomePageController, HomePageData>((){
+  return HomePageController();
+});
 
-  const HomePage({super.key, required this.didSelectShow, required this.apiService});
+class HomePage extends ConsumerStatefulWidget {
+
+
+  const HomePage({super.key,});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  ConsumerState<HomePage> createState() => _HomePageState();
 }
 
 
+class _HomePageState extends ConsumerState<HomePage> {
 
-
-
-
-
-
-class _HomePageState extends State<HomePage> {
-
-  late List<Show> shows=[];
-  int id = 0;
-  int offset=10;
-  int currentPageNumber=0;
   final scrollController=ScrollController();
-  late Future<void> showFuture;
-  bool isLoaded=false;
-  bool isLoading=false;
-  StreamSubscription? showStreamSet;
-  StreamSubscription? showStreamAdd;
-
-
-
-
-  Future<void> setUpShows() async{
-
-    if(isLoading)return;
-
-    final List<dynamic>? pageResults=await widget.apiService.fetchResultsbyPage(currentPageNumber++);
-
-    final showsResults = pageResults?.map((map)=>Show.fromJson(map)).toList();
-    setState(() {
-      shows=showsResults??[];
-    });
-
-    await DatabaseService.putShowsinDatabase(shows);
-
-
-
-
-    isLoaded=true;
-
-  }
-
-  Future<void> addShows() async{
-
-    if(!isLoaded)return;
-    if(isLoading)return;
-
-    isLoading=true;
-
-    final List<dynamic>? searchResults=await widget.apiService.fetchResultsbyPage(currentPageNumber++);
-
-    final showsResults = searchResults?.map((map)=>Show.fromJson(map)).toList();
-    setState(() {
-      setState(() {
-        shows = [...shows, ...?showsResults];
-      });;
-    });
-
-    isLoading=false;
-
-    await DatabaseService.putShowsinDatabase(shows);
-
-
-  }
-
-
-
-
-
-
+  late HomePageController _homePageController;
+  late AsyncValue<HomePageData> _homePageData;
 
 
   @override
   void initState() {
     super.initState();
-    if(!isLoaded) {
-      setUpShows();
-    }
+
     
     scrollController.addListener((){
       if(scrollController.position.maxScrollExtent==scrollController.offset){
-        addShows();
+        _homePageController.loadShows();
       }
     });
+
   }
 
   @override
   void dispose() {
-    showStreamSet?.cancel();
-    showStreamAdd?.cancel();
     scrollController.dispose();
     super.dispose();
   }
 
-
-
-
-
   @override
   Widget build(BuildContext context) {
 
+    _homePageController= ref.watch(homePageControllerProvider.notifier);
+    _homePageData=ref.watch(homePageControllerProvider);
 
+
+    return _homePageData.when(
+      loading: () =>  homePageWidget(true, [], scrollController),
+      error: (err, stack) => Center(child: Text('Error fetching details: $err')),
+      data: (shows)=> homePageWidget(false, shows.shows, scrollController)
+    );
+
+  }
+
+  Widget homePageWidget(
+      bool isLoading,
+      List<Show> shows,
+      ScrollController scrollController
+      ){
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blue,
-        title: Text(
-          'Home — Popular Shows',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 28.0,
+        appBar: AppBar(
+          backgroundColor: Colors.blue,
+          title: Text(
+            'Home — Popular Shows',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 28.0,
+            ),
           ),
         ),
-      ),
-      body: ShowListView(shows: shows, scrollController: scrollController, didSelectShow: widget.didSelectShow,isSearch: false,)
+        body: Skeletonizer(
+            enabled: isLoading,
+            child: ShowListView(shows: shows, scrollController: scrollController,isHome: true,)
+        )
 
 
     );
+
   }
 }
 

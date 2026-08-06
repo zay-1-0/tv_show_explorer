@@ -56,6 +56,7 @@ class _MyAppState extends ConsumerState<MyApp> {
       ),
       FavoritesPage(
       ),
+
     ];
 
   }
@@ -72,7 +73,15 @@ class _MyAppState extends ConsumerState<MyApp> {
 
     return  MaterialApp(
         title: 'TV Show Explorer',
-        home: Navigator(
+        home: PopScope<Object?>(
+          canPop: show==null,
+          onPopInvokedWithResult: (bool didPop, Object? result) async{
+            if (!didPop && show != null) {
+              ref.read(selectedShowProvider.notifier).deselectShow();
+            }
+
+          },
+          child: Navigator(
           pages: [
             MaterialPage(
               key: const ValueKey('MainPage'),
@@ -86,15 +95,36 @@ class _MyAppState extends ConsumerState<MyApp> {
                   },
                   destinations: const [
                     NavigationDestination(
-                      icon: Icon(Icons.home_filled),
+                      icon: Icon(
+                        Icons.home_filled,
+                        size: 34,
+                      ),
                       label: 'Home',
+                      selectedIcon: Icon(
+                        Icons.home_filled,
+                        size: 34,
+                        color: Color(0xffec3013),
+                      ),
                     ),
                     NavigationDestination(
-                      icon: Icon(Icons.search),
+                      icon: Icon(
+                        Icons.search,
+                        size: 36,
+                      ),
+                      selectedIcon: Icon(
+                        Icons.search,
+                        size: 36,
+                        color: Color(0xffec3013),
+                      ),
                       label: 'Search',
                     ),
                     NavigationDestination(
                       icon: Icon(Icons.favorite),
+                      selectedIcon: Icon(
+                        Icons.favorite,
+                        size: 36,
+                        color: Color(0xffec3013),
+                      ),
                       label: 'Favorites',
                     ),
                   ],
@@ -109,7 +139,9 @@ class _MyAppState extends ConsumerState<MyApp> {
             if (show!=null)
               MaterialPage(
                 key: const ValueKey('DetailsPage'),
+                canPop: false,
                 child: DetailWidget(showId: show.showID,),
+
               ),
           ],
           onDidRemovePage: (page) {
@@ -118,6 +150,7 @@ class _MyAppState extends ConsumerState<MyApp> {
             }
           },
         ),
+      )
       )
     ;
   }

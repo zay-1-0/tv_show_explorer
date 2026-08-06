@@ -9,8 +9,8 @@ import 'package:tv_show_explorer/widgets/show_list_view.dart';
 
 
 
-final searchPageControllerProvider= AsyncNotifierProvider<SearchPageConroller, List<Show>>((){
-  return SearchPageConroller();
+final searchPageControllerProvider= AsyncNotifierProvider<SearchPageController, List<Show>>((){
+  return SearchPageController();
 });
 
 
@@ -36,61 +36,93 @@ class SearchPage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-            'Search for shows',
+            'Search',
           style: TextStyle(
             color: Colors.white,
             fontSize: 28.0,
           ),
         ),
-        backgroundColor: Colors.blue,
+        backgroundColor: Color(0xff2d2b2b),
+        leading: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 0, 0),
+          child: Icon(
+            Icons.search_rounded,
+            size: 40,
+            color: Colors.white,
+          ),
+        ),
+
+        bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(100),
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(20, 20, 20, 40),
+              child: TextField(
+
+                controller: searchQuery,
+                onChanged: (value){
+                  ref.read(searchPageControllerProvider.notifier).onSearchChanged(value);
+                },
+                decoration: InputDecoration(
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Color(0xff2d2b2b),
+                        width: 1.5,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Color(0xff2d2b2b),
+                        width: 1.5,
+                      ),
+                    ),
+                    hintText: 'Type show\'s name',
+                    suffixIcon: Icon(
+                      Icons.search_rounded,
+                      size: 32,
+                    ),
+                    hintStyle: TextStyle(
+                      color: Color(0xff2d2b2b),
+                    ),
+                  fillColor: Colors.white,
+                  filled: true,
+                  isDense: true,
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: 4.0,
+                    horizontal: 10.0,
+                  ),
+                ),
+                style: TextStyle(
+                  color: Color(0xff2d2b2b),
+                  fontSize: 20
+                ),
+
+              ),
+            )
+        ),
       ),
 
-      body: Column(
-        children: [
-          TextField(
-            controller: searchQuery,
-            onChanged: (value){
-              ref.read(searchPageControllerProvider.notifier).onSearchChanged(value);
-            },
-            decoration: InputDecoration(
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(
-                  color: Colors.blueGrey,
-                  width: 1.5,
-                ),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(
-                  color: Colors.blueGrey,
-                  width: 1.5,
-                ),
-              ),
-              hintText: 'Type show\'s name'
-            ),
-
-
-          ),
+      body:
 
           searchState.when(
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (err, stack) => Center(child: Text('Error searching: $err')),
             data: (searchResults){
               if(searchResults.isEmpty) {
-                return Text(
-                  'No Results',
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.blueGrey,
-                    fontWeight: FontWeight.w400,
+                return Center(
+                  child: Text(
+                    'Try searching for something',
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Color(0xff2d2b2b),
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
                 );
               }
 
-              return Expanded(
-                child: ShowListView(
+              return ShowListView(
                   shows: searchResults,
-                  isSearch: true,),
-              );
+                );
 
 
 
@@ -98,8 +130,8 @@ class SearchPage extends ConsumerWidget {
             }
           ),
 
-        ],
-      ),
+      //   ],
+      // ),
     );
   }
 }

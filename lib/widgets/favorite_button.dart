@@ -2,59 +2,55 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:get_it/get_it.dart';
-
 import '../classes/show.dart';
-import '../services/database_service.dart';
+import '../providers/favorites_provider.dart';
 
-final showProvider = StreamProvider.family<Show?, int>((ref, showId) {
-  final databaseService = GetIt.instance.get<DatabaseService>();
-  return databaseService.getShowStream(showId);
-});
+
+
+
+
+
+
+
 
 class FavoriteButton extends ConsumerWidget {
-  final int showId;
+  final Show show;
 
 
-  const FavoriteButton({
+  FavoriteButton({
     super.key,
-    required this.showId,
+    required this.show,
   });
+
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
 
 
-    final showAsync = ref.watch(showProvider(showId));
+    final isFavorite = ref.watch(isFavoriteProvider(show.showID));
 
-    return showAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (err, stack) => Center(child: Text('Error searching: $err')),
-      data: (show){
-        if(show==null){
-          return const SizedBox.shrink();
+    return IconButton(
+
+      onPressed: (){
+
+
+        if(isFavorite) {
+          ref.read(favoriteControllerProvider.notifier).removeFavorite(show);
+        } else {
+          ref.read(favoriteControllerProvider.notifier).addFavorite(show);
         }
+      },
 
-        return IconButton.filled(
-          style: IconButton.styleFrom(
-            backgroundColor: Colors.indigoAccent,
-          ),
+      icon: Icon(
 
-          onPressed: () async {
-            show.isFavorite = !show.isFavorite;
-            final databaseService=GetIt.instance.get<DatabaseService>();
-            databaseService.putShowinDatabase(show);
-          },
-          icon: Icon(
-            Icons.favorite,
-            size: 25,
-            color: show.isFavorite ? Colors.red : Colors.black38,
-          ),
-        );
+        isFavorite? Icons.favorite : Icons.favorite_outline_rounded,
+        size: 34,
+        color: Color(0xffec3013),
 
-
-      }
+      ),
     );
+
+    
 
   }
 }

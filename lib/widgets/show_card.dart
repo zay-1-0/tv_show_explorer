@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tv_show_explorer/providers/main_page_provider.dart';
 import 'package:tv_show_explorer/widgets/favorite_button.dart';
+import 'package:tv_show_explorer/widgets/genre_card.dart';
 
 import '../classes/show.dart';
 
@@ -15,80 +16,14 @@ class ShowCard extends ConsumerWidget
   Widget build(BuildContext context, WidgetRef ref) {
 
 
-    return oldCard(ref, context);
+    return showCard(ref, context);
 
   }
 
 
-  Widget genreCard(){
-    if(currShow.genres.isNotEmpty) {
-      return Card(
-      shape: ContinuousRectangleBorder(
-        side: const BorderSide(
-          color: Color(0xFFec3013), // Your chosen border color
-          width: 2.0,          // Border thickness
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: Text(
-            currShow.genres.first,
-          style: TextStyle(
-            color: Color(0xFFec3013)
-          ),
-        ),
-      ),
-    );
-    }
-
-    return SizedBox.shrink();
-  }
 
 
-  Widget newCard(
-      WidgetRef ref,
-      BuildContext context
-      ){
-    return Container(
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: Color(0xffa29e9e),
-            width: 3
-          )
-        )
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        crossAxisAlignment: CrossAxisAlignment.center,
-
-        children: [
-          SizedBox(
-            width: MediaQuery.sizeOf(context).width * 0.2,
-            child: Image.network(
-              currShow.imageURL,
-              fit: BoxFit.cover,
-              errorBuilder: (context, exception, stackTrace) {
-                return const Center(
-                  child: Icon(
-                    Icons.broken_image,
-                    color: Colors.red,
-                    size: 50,
-                  ),
-                );
-              },
-            ),
-          ),
-
-
-
-        ],
-      ),
-    );
-  }
-
-
-  Widget oldCard(
+  Widget showCard(
       WidgetRef ref,
       BuildContext context
       ){
@@ -178,7 +113,7 @@ class ShowCard extends ConsumerWidget
 
                             Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 12),
-                              child: genreCard(),
+                              child: GenreCard(currShow: currShow, isDetails: false),
                             ),
                           ],
                         ),

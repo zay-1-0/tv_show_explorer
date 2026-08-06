@@ -28,7 +28,7 @@ class HomePageController extends AsyncNotifier<HomePageData>{
     state= await AsyncValue.guard(() async {
       final List<dynamic>? pageResults=await _apiService.fetchResultsbyPage(state.value!.pageNumber);
       final List<Show>? showsResults = pageResults?.map((map)=>Show.fromJson(map)).toList();
-      return HomePageData(shows: showsResults??[], pageNumber: state.value!.pageNumber+1);
+      return HomePageData(shows:[...state.value?.shows??[],  ...showsResults??[]], pageNumber: state.value!.pageNumber+1);
 
     });
 

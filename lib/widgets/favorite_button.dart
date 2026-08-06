@@ -2,34 +2,26 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:get_it/get_it.dart';
-import 'package:tv_show_explorer/controllers/favorite_page_controller.dart';
 import '../classes/show.dart';
-import '../services/database_service.dart';
+import '../providers/favorites_provider.dart';
 
 
 
 
-final favoriteControllerProvider =
-AsyncNotifierProvider<FavoritePageController, void>(
-  FavoritePageController.new,
-);
 
-final isFavoriteProvider =
-StreamProvider.family<bool, int>((ref, showId) {
-  final database = GetIt.instance<DatabaseService>();
 
-  return database.watchIsFavorite(showId);
-});
+
+
 
 class FavoriteButton extends ConsumerWidget {
   final Show show;
 
 
-  const FavoriteButton({
+  FavoriteButton({
     super.key,
     required this.show,
   });
+
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -41,22 +33,21 @@ class FavoriteButton extends ConsumerWidget {
 
       onPressed: (){
 
-        ref.read(favoriteControllerProvider.notifier).onPressed(show);
-        
+
+        if(isFavorite) {
+          ref.read(favoriteControllerProvider.notifier).removeFavorite(show);
+        } else {
+          ref.read(favoriteControllerProvider.notifier).addFavorite(show);
+        }
       },
+
       icon: Icon(
-        isFavorite.when(
-          data: (favorite) =>
-          favorite ?  Icons.favorite :  Icons.favorite_outline_rounded,
-          loading: () => Icons.favorite_outline_rounded,
-          error: (_, __) => Icons.favorite_outline_rounded,
-        ),
+
+        isFavorite? Icons.favorite : Icons.favorite_outline_rounded,
         size: 34,
         color: Color(0xffec3013),
 
-
-
-        ),
+      ),
     );
 
     

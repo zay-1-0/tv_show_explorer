@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:get_it/get_it.dart';
-import 'package:tv_show_explorer/services/database_service.dart';
 import 'package:tv_show_explorer/widgets/show_list_view.dart';
 
-import '../classes/show.dart';
+import '../providers/favorites_provider.dart';
 
 
-final favoritesProvider = StreamProvider<List<Show>>((ref) {
-  final databaseService=GetIt.instance.get<DatabaseService>();
-  return databaseService.getFavoritesStream();
-});
+
 
 class FavoritesPage extends ConsumerWidget {
 

@@ -110,7 +110,7 @@ class SearchPage extends ConsumerWidget {
               if(searchResults.isEmpty) {
                 return Center(
                   child: Text(
-                    'No Results. Try another search',
+                    'Try searching for something',
                     style: TextStyle(
                       fontSize: 20,
                       color: Color(0xff2d2b2b),

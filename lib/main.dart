@@ -95,15 +95,36 @@ class _MyAppState extends ConsumerState<MyApp> {
                   },
                   destinations: const [
                     NavigationDestination(
-                      icon: Icon(Icons.home_filled),
+                      icon: Icon(
+                        Icons.home_filled,
+                        size: 34,
+                      ),
                       label: 'Home',
+                      selectedIcon: Icon(
+                        Icons.home_filled,
+                        size: 34,
+                        color: Color(0xffec3013),
+                      ),
                     ),
                     NavigationDestination(
-                      icon: Icon(Icons.search),
+                      icon: Icon(
+                        Icons.search,
+                        size: 36,
+                      ),
+                      selectedIcon: Icon(
+                        Icons.search,
+                        size: 36,
+                        color: Color(0xffec3013),
+                      ),
                       label: 'Search',
                     ),
                     NavigationDestination(
                       icon: Icon(Icons.favorite),
+                      selectedIcon: Icon(
+                        Icons.favorite,
+                        size: 36,
+                        color: Color(0xffec3013),
+                      ),
                       label: 'Favorites',
                     ),
                   ],

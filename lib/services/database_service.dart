@@ -58,7 +58,7 @@ class DatabaseService {
   Stream<List<Show>> getFavoritesStream(){
 
     return db.shows
-        .filter().isFavoriteEqualTo(true)
+        .where()
         .watch(fireImmediately: true);
   }
 
@@ -68,6 +68,19 @@ class DatabaseService {
       fireImmediately: true,
     );
   }
+
+  Future<void> deleteShow(Show show) async {
+    await db.writeTxn(() async {
+      await db.shows.delete(show.showID);
+    });
+  }
+
+  Stream<bool> watchIsFavorite(int showId) {
+    return db.shows
+        .watchObject(showId, fireImmediately: true)
+        .map((show) => show != null);
+  }
+
 
 
 }

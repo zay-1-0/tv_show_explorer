@@ -24,16 +24,17 @@ class FavoritesPage extends ConsumerWidget {
       data: (shows) => Scaffold(
 
         appBar: AppBar(
-          backgroundColor: Colors.blue,
+          backgroundColor: Color(0xff7c1405),
           title: Text(
-            'Favorites Page',
+            'Favorites',
             style: TextStyle(
               color: Colors.white,
               fontSize: 28.0,
             ),
           ),
         ),
-          body: ShowListView(shows: shows, isFavorites: true),
+          body: ShowListView(shows: shows, isFavorite: true,
+          ),
 
       ),
       loading: () => const Center(child: CircularProgressIndicator()),

@@ -56,6 +56,7 @@ class _MyAppState extends ConsumerState<MyApp> {
       ),
       FavoritesPage(
       ),
+
     ];
 
   }
@@ -72,7 +73,15 @@ class _MyAppState extends ConsumerState<MyApp> {
 
     return  MaterialApp(
         title: 'TV Show Explorer',
-        home: Navigator(
+        home: PopScope<Object?>(
+          canPop: show==null,
+          onPopInvokedWithResult: (bool didPop, Object? result) async{
+            if (!didPop && show != null) {
+              ref.read(selectedShowProvider.notifier).deselectShow();
+            }
+
+          },
+          child: Navigator(
           pages: [
             MaterialPage(
               key: const ValueKey('MainPage'),
@@ -109,7 +118,9 @@ class _MyAppState extends ConsumerState<MyApp> {
             if (show!=null)
               MaterialPage(
                 key: const ValueKey('DetailsPage'),
+                canPop: false,
                 child: DetailWidget(showId: show.showID,),
+
               ),
           ],
           onDidRemovePage: (page) {
@@ -118,6 +129,7 @@ class _MyAppState extends ConsumerState<MyApp> {
             }
           },
         ),
+      )
       )
     ;
   }

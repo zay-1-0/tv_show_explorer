@@ -15,51 +15,146 @@ class ShowCard extends ConsumerWidget
   Widget build(BuildContext context, WidgetRef ref) {
 
 
+    return oldCard(ref, context);
+
+  }
+
+
+  Widget genreCard(){
+    if(currShow.genres.isNotEmpty) {
+      return Card(
+      shape: ContinuousRectangleBorder(
+        side: const BorderSide(
+          color: Color(0xFFec3013), // Your chosen border color
+          width: 2.0,          // Border thickness
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: Text(
+            currShow.genres.first,
+          style: TextStyle(
+            color: Color(0xFFec3013)
+          ),
+        ),
+      ),
+    );
+    }
+
+    return SizedBox.shrink();
+  }
+
+
+  Widget newCard(
+      WidgetRef ref,
+      BuildContext context
+      ){
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: Color(0xffa29e9e),
+            width: 3
+          )
+        )
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        crossAxisAlignment: CrossAxisAlignment.center,
+
+        children: [
+          SizedBox(
+            width: MediaQuery.sizeOf(context).width * 0.2,
+            child: Image.network(
+              currShow.imageURL,
+              fit: BoxFit.cover,
+              errorBuilder: (context, exception, stackTrace) {
+                return const Center(
+                  child: Icon(
+                    Icons.broken_image,
+                    color: Colors.red,
+                    size: 50,
+                  ),
+                );
+              },
+            ),
+          ),
+
+
+
+        ],
+      ),
+    );
+  }
+
+
+  Widget oldCard(
+      WidgetRef ref,
+      BuildContext context
+      ){
+
     return SizedBox(
-      height: 280,
+      height: 150,
       child: InkWell(
         onTap: () {
-            ref.read(selectedShowProvider.notifier).selectNewShow(currShow);
+          ref.read(selectedShowProvider.notifier).selectNewShow(currShow);
         },
-        child: Card(
-          color: Colors.indigoAccent[100],
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        child: Container(
+
+            decoration: BoxDecoration(
+                border: Border(
+                    bottom: BorderSide(
+                        color: Color(0xffa29e9e),
+                        width: 2
+                    )
+                )
+            ),
+
+
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(
-                  width: MediaQuery.sizeOf(context).width * 0.4,
-                  height: double.infinity,
-                  child: Image.network(
-                    currShow.imageURL,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, exception, stackTrace) {
-                      return const Center(
-                        child: Icon(
-                          Icons.broken_image,
-                          color: Colors.red,
-                          size: 50,
-                        ),
-                      );
-                    },
+                  width: MediaQuery.sizeOf(context).width * 0.24,
+                  //height: double.infinity,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4,vertical: 0),
+                    child: Image.network(
+                      currShow.imageURL,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, exception, stackTrace) {
+                        return const Center(
+                          child: Icon(
+                            Icons.broken_image,
+                            color: Colors.red,
+                            size: 50,
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ),
 
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: Column(
+
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          currShow.title,
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w400,
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 24, 0, 0),
+                          child: Text(
+                            currShow.title,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w400,
+                              color: Color(0xff2f0701)
+                            ),
+                            maxLines: 4,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          maxLines: 4,
-                          overflow: TextOverflow.ellipsis,
                         ),
 
                         const SizedBox(height: 8),
@@ -68,31 +163,40 @@ class ShowCard extends ConsumerWidget
                           children: [
                             const Icon(
                               Icons.star,
-                              color: Colors.amberAccent,
-                              size: 30,
+                              color: Color(0xff7c1405),
+                              size: 20,
                             ),
-                            const SizedBox(width: 4),
+                            const SizedBox(width: 2),
                             Text(
                               currShow.rating.toString(),
                               style: const TextStyle(
-                                fontSize: 20,
-                                color: Colors.amberAccent,
+                                fontSize: 14,
+                                color: Color(0xff7c1405),
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
+
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              child: genreCard(),
+                            ),
                           ],
                         ),
+
+
                       ],
                     ),
                   ),
                 ),
 
-                FavoriteButton(
-                  showId: currShow.showID,
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 12, 0),
+                  child: FavoriteButton(
+                    show: currShow,
+                  ),
                 ),
               ],
             ),
-          ),
         ),
       ),
     );

@@ -3,58 +3,63 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_it/get_it.dart';
-
+import 'package:tv_show_explorer/controllers/favorite_page_controller.dart';
 import '../classes/show.dart';
 import '../services/database_service.dart';
 
-final showProvider = StreamProvider.family<Show?, int>((ref, showId) {
-  final databaseService = GetIt.instance.get<DatabaseService>();
-  return databaseService.getShowStream(showId);
+
+
+
+final favoriteControllerProvider =
+AsyncNotifierProvider<FavoritePageController, void>(
+  FavoritePageController.new,
+);
+
+final isFavoriteProvider =
+StreamProvider.family<bool, int>((ref, showId) {
+  final database = GetIt.instance<DatabaseService>();
+
+  return database.watchIsFavorite(showId);
 });
 
 class FavoriteButton extends ConsumerWidget {
-  final int showId;
+  final Show show;
 
 
   const FavoriteButton({
     super.key,
-    required this.showId,
+    required this.show,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
 
 
-    final showAsync = ref.watch(showProvider(showId));
+    final isFavorite = ref.watch(isFavoriteProvider(show.showID));
 
-    return showAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (err, stack) => Center(child: Text('Error searching: $err')),
-      data: (show){
-        if(show==null){
-          return const SizedBox.shrink();
-        }
+    return IconButton(
 
-        return IconButton.filled(
-          style: IconButton.styleFrom(
-            backgroundColor: Colors.indigoAccent,
-          ),
+      onPressed: (){
 
-          onPressed: () async {
-            show.isFavorite = !show.isFavorite;
-            final databaseService=GetIt.instance.get<DatabaseService>();
-            databaseService.putShowinDatabase(show);
-          },
-          icon: Icon(
-            Icons.favorite,
-            size: 25,
-            color: show.isFavorite ? Colors.red : Colors.black38,
-          ),
-        );
+        ref.read(favoriteControllerProvider.notifier).onPressed(show);
+        
+      },
+      icon: Icon(
+        isFavorite.when(
+          data: (favorite) =>
+          favorite ?  Icons.favorite :  Icons.favorite_outline_rounded,
+          loading: () => Icons.favorite_outline_rounded,
+          error: (_, __) => Icons.favorite_outline_rounded,
+        ),
+        size: 34,
+        color: Color(0xffec3013),
 
 
-      }
+
+        ),
     );
+
+    
 
   }
 }

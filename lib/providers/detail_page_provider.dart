@@ -13,19 +13,15 @@ final detailPageShowProvider = FutureProvider.family<Show?, int>((ref, showId) a
 
   Show? show= await databaseService.getShowFromDatabase(showId);
 
-  if (show == null) return show;
-
-  if (show.posterURL.isEmpty) {
-    final url = await apiService.fetchPosterUrl(showId);
-
-    if (url != null) {
-      show.posterURL = url;
-
-      await databaseService.putShowinDatabase(show);
+  if(show==null){
+    Map? map= await apiService.fetchShow(showId);
+    if(map!=null) {
+      show = Show.fromJson(map);
     }
   }
-  show = await databaseService.getShowFromDatabase(showId);
+
   return show;
+
 
 
 });

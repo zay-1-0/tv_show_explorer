@@ -76,7 +76,7 @@ class _HomePageState extends ConsumerState<HomePage> {
       ){
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.blue,
+          backgroundColor: Color(0xffec3013),
           title: Text(
             'Home — Popular Shows',
             style: TextStyle(

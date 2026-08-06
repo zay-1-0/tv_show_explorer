@@ -4,24 +4,21 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:tv_show_explorer/services/api_service.dart';
-import 'package:tv_show_explorer/services/database_service.dart';
 import 'package:get_it/get_it.dart';
 
 import '../classes/show.dart';
 
-class SearchPageConroller extends AsyncNotifier<List<Show>>{
+class SearchPageController extends AsyncNotifier<List<Show>>{
 
   Timer? _debounce;
   String _lastSearchText = '';
   final GetIt _getIt=GetIt.instance;
   late ApiService _apiService;
-  late DatabaseService _databaseService;
 
   @override
   FutureOr<List<Show>> build() {
     ref.onDispose(() => _debounce?.cancel());
     _apiService=_getIt.get<ApiService>();
-    _databaseService=_getIt.get<DatabaseService>();
     return [];
   }
 
@@ -38,10 +35,9 @@ class SearchPageConroller extends AsyncNotifier<List<Show>>{
 
             
             state=await AsyncValue.guard(() async {
+
               final results = await _apiService.fetchSearchResults(query);
               final shows = results?.map((r) => Show.fromJson(r['show'])).toList()??[];
-              await _databaseService.putShowsinDatabase(shows);
-
               return shows;
 
             });

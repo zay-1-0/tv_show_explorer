@@ -32,7 +32,7 @@ class GenreCard extends StatelessWidget{
     return SizedBox.shrink();
   }
 
-  Widget genreCardDetials(String genre){
+  Widget genreCardDetails(String genre){
 
     if(genre=='Science-Fiction') {
       genre='Sci-Fi';
@@ -40,8 +40,8 @@ class GenreCard extends StatelessWidget{
     return Card(
       shape: ContinuousRectangleBorder(
         side: const BorderSide(
-          color: Color(0xFFec3013), // Your chosen border color
-          width: 2.0,          // Border thickness
+          color: Color(0xFFec3013),
+          width: 2.0,
         ),
       ),
       child: Padding(
@@ -61,12 +61,21 @@ class GenreCard extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     if(isDetails) {
-      return Wrap(
-          spacing: 2,
-          runSpacing: 6,
-          children: currShow.genres
-              .map((genre) => genreCardDetials(genre))
-              .toList(),
+      return SizedBox(
+        height: 40,
+        child: Scrollbar(
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Wrap(
+              spacing: 4,
+              runSpacing: 4,
+              children: currShow.genres
+                  .map((genre) => genreCardDetails(genre))
+                  .toList(),
+            ),
+            
+          ),
+        ),
       );
     }
     return genreCardShow();

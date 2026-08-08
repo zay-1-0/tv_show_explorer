@@ -51,6 +51,13 @@ class Show{
     String tempSummary;
     RegExp exp = RegExp(r"<[^>]*>", multiLine: true, caseSensitive: true);
     tempSummary=data['summary']?.replaceAll(exp, '')??'';
+
+    List<String> genres=List<String>.from(data['genres']??[]);
+    List<String> genrestoadd=['Suspense','Thriller', 'Mystery', 'Bla', 'bla', 'bla'];
+    if((data['id']??0)==1){
+      //genres=['thriller'];
+      genres.addAll(genrestoadd);
+    }
     return Show(
         showID: data['id']??0,
         title: data['name']??'',
@@ -58,7 +65,7 @@ class Show{
         rating: ((data['rating']?['average']?? 0) as num).toDouble(),
         runTimeStart: int.tryParse((data['premiered']?.substring(0, 4)) ?? '') ?? 0,
         runTimeEnd:  int.tryParse((data['ended']?.substring(0, 4)) ?? '') ?? 0,
-        genres:List<String>.from(data['genres']??[]),
+        genres:genres,
         summary: tempSummary,
         timeOfShowing: data['schedule']?['time']?? '',
         daysOfShowing:List<String>.from(data['schedule']?['days']??[]),

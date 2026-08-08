@@ -139,7 +139,6 @@ class _MyAppState extends ConsumerState<MyApp> {
             if (show!=null)
               MaterialPage(
                 key: const ValueKey('DetailsPage'),
-                canPop: false,
                 child: DetailWidget(showId: show.showID,),
 
               ),

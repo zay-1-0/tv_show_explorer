@@ -51,284 +51,316 @@ class DetailWidget extends ConsumerWidget{
     final isFavorite=ref.watch(isFavoriteProvider(currentShow?.showID??0));
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Show Details',
+          style: const TextStyle(
+            fontSize: 26,
+            color: Color(0xff2d2b2b),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+
+      ),
           backgroundColor: Color(0xfff3f2f2),
           body: Skeletonizer(
             enabled: isLoading,
             child: LayoutBuilder(
               builder: (context, viewportConstraints) {
-                return SingleChildScrollView(
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minHeight: viewportConstraints.maxHeight,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Image.network(
-                          currentShow?.posterURL??'',
-                          height: 200,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, exception, stackTrace) {
-                            return const SizedBox(
-                              height: 200,
-                              child: Center(
-                                child: Icon(
-                                  Icons.broken_image,
-                                  color: Colors.red,
-                                  size: 50,
+                return Scrollbar(
+                  scrollbarOrientation: ScrollbarOrientation.right,
+                  thickness: 8,
+                  radius: Radius.circular(18),
+                  child: SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: viewportConstraints.maxHeight,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Image.network(
+                            currentShow?.posterURL??'',
+                            height: 200,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, exception, stackTrace) {
+                              return const SizedBox(
+                                height: 200,
+                                child: Center(
+                                  child: Icon(
+                                    Icons.broken_image,
+                                    color: Colors.red,
+                                    size: 50,
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
-                        ),
-
-                        SizedBox(
-                            height: (currentShow?.genres.length??0) > 3   ?  MediaQuery.sizeOf(context).height*0.18 : MediaQuery.sizeOf(context).height*0.12,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 8),
-                              child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-
-                                    Expanded(
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(vertical: 10),
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              crossAxisAlignment: CrossAxisAlignment.center,
-                                              children: [
-
-                                                SizedBox(width: 20,),
-
-                                                Expanded(
-                                                  child: Text(
-                                                    currentShow?.title??'',
-                                                    maxLines: 2,
-                                                    overflow: TextOverflow.ellipsis,
-                                                    style: const TextStyle(
-                                                      fontSize: 26,
-                                                      color: Color(0xff2d2b2b),
-                                                      fontWeight: FontWeight.bold,
+                              );
+                            },
+                            loadingBuilder:
+                                (
+                                BuildContext context,
+                                Widget child,
+                                ImageChunkEvent? loadingProgress,
+                                ) {
+                              if (loadingProgress == null) {
+                                return child;
+                              }
+                              return Center(
+                                child: CircularProgressIndicator(
+                                  value: loadingProgress.expectedTotalBytes != null
+                                      ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                      : null,
+                                ),
+                              );
+                            },
+                          ),
+                  
+                          IntrinsicHeight(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 8),
+                                child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                  
+                                      Expanded(
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(vertical: 10),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                children: [
+                  
+                                                  SizedBox(width: 20,),
+                  
+                                                  Expanded(
+                                                    child: Text(
+                                                      currentShow?.title??'',
+                                                      maxLines: 2,
+                                                      style: const TextStyle(
+                                                        fontSize: 26,
+                                                        color: Color(0xff2d2b2b),
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
-
-                                              ],
-                                            ),
-
-                                            Padding(
-                                              padding: const EdgeInsets.all(8.0),
-                                              child: Row(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-
-                                                    SizedBox(width: 8,),
-
-                                                    const Icon(
-                                                      Icons.star,
-                                                      color: Color(0xff7c1405),
-                                                    ),
-                                                    const SizedBox(width: 4),
-                                                    Text(
-                                                      currentShow?.rating.toString()??'',
-                                                      style: TextStyle(
-                                                        fontSize: 18,
+                  
+                                                ],
+                                              ),
+                  
+                                              Padding(
+                                                padding: const EdgeInsets.all(8.0),
+                                                child: Row(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                  
+                                                      SizedBox(width: 8,),
+                  
+                                                      const Icon(
+                                                        Icons.star,
                                                         color: Color(0xff7c1405),
                                                       ),
-                                                    ),
-                                                    const SizedBox(width: 16),
-                                                    Text(
-                                                      '${currentShow?.runTimeStart??''} - ${currentShow?.runTimeEnd??''}',
-                                                      style: TextStyle(
+                                                      const SizedBox(width: 4),
+                                                      Text(
+                                                        currentShow?.rating.toString()??'',
+                                                        style: TextStyle(
                                                           fontSize: 18,
-                                                          color: Color(0xff2d2b2b),
-                                                        fontWeight: FontWeight.w500
+                                                          color: Color(0xff7c1405),
+                                                        ),
                                                       ),
-                                                    ),
-
-                                                    Expanded(
-                                                      child: Padding(
-                                                        padding: const EdgeInsets.only(left: 14),
-                                                        child: GenreCard(currShow: currentShow??Show.empty(), isDetails: true),
+                                                      const SizedBox(width: 16),
+                                                      Text(
+                                                        '${currentShow?.runTimeStart??''} - ${currentShow?.runTimeEnd??''}',
+                                                        style: TextStyle(
+                                                            fontSize: 18,
+                                                            color: Color(0xff2d2b2b),
+                                                          fontWeight: FontWeight.w500
+                                                        ),
                                                       ),
-                                                    )
-                                                  ],
-                                                ),
-                                            ),
-
-
-                                          ],
+                  
+                                                      Expanded(
+                                                        child: Padding(
+                                                          padding: const EdgeInsets.only(left: 14),
+                                                          child: GenreCard(currShow: currentShow??Show.empty(), isDetails: true),
+                                                        ),
+                                                      )
+                                                    ],
+                                                  ),
+                                              ),
+                  
+                  
+                                            ],
+                                          ),
                                         ),
                                       ),
+                                    ],
+                                  ),
+                              ),
+                            ),
+                  
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 26),
+                            child: ReadMoreText(
+                                currentShow?.summary??'',
+                                trimMode: TrimMode.Line,
+                                trimLines: 3,
+                                colorClickableText: Color(0xffdd2b0f),
+                                trimCollapsedText: 'Show more',
+                                trimExpandedText: '\n Show less',
+                                style:  TextStyle(
+                                      fontSize: 20,
+                                      color: Color(0xff2d2b2b),
+                                      fontWeight: FontWeight.w500,
                                     ),
-                                  ],
-                                ),
-                            ),
+                              ),
                           ),
-
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 26),
-                          child: ReadMoreText(
-                              currentShow?.summary??'',
-                              trimMode: TrimMode.Line,
-                              trimLines: 3,
-                              colorClickableText: Color(0xffdd2b0f),
-                              trimCollapsedText: 'Show more',
-                              trimExpandedText: '\n Show less',
-                              style:  TextStyle(
-                                    fontSize: 20,
-                                    color: Color(0xff2d2b2b),
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                            ),
-                        ),
-
-
-                        SizedBox(height: 12,),
-
-                        Divider(
-                          color: Color(0xff9f9d9d),
-                          thickness: 4,
-                          indent: 14,
-                          endIndent: 14,
-                        ),
-                        ListTile(
-                          leading: Text(
-                            'Schedule',
-                            style: TextStyle(
-                              color: Color(0xff262626),
-                              fontSize: 20
-                            ),
+                  
+                  
+                          SizedBox(height: 12,),
+                  
+                          Divider(
+                            color: Color(0xff9f9d9d),
+                            thickness: 4,
+                            indent: 14,
+                            endIndent: 14,
                           ),
-
-                          trailing: Text(
-                            '${currentShow?.daysOfShowing.first??''}, ${currentShow?.timeOfShowing??''}',
-                            style: TextStyle(
+                          ListTile(
+                            leading: Text(
+                              'Schedule',
+                              style: TextStyle(
                                 color: Color(0xff262626),
                                 fontSize: 20
+                              ),
                             ),
-                          ),
-                        ),
-
-                        Divider(
-                          color: Color(0x889f9d9d),
-                          thickness: 4,
-                          indent: 24,
-                          endIndent: 24,
-                        ),
-
-                        ListTile(
-                          leading: Text(
-                            'Network',
-                            style: TextStyle(
-                                color: Color(0xff262626),
-                                fontSize: 20
-                            ),
-                          ),
-
-                          trailing: Text(
-                            currentShow?.network??'',
-                            style: TextStyle(
-                                color: Color(0xff262626),
-                                fontSize: 20
-                            ),
-                          ),
-                        ),
-
-                        Divider(
-                          color: Color(0x889f9d9d),
-                          thickness: 4,
-                          indent: 24,
-                          endIndent: 24,
-                        ),
-
-                        ListTile(
-                          leading: Text(
-                            'Status',
-                            style: TextStyle(
-                                color: Color(0xff262626),
-                                fontSize: 20
-                            ),
-                          ),
-
-                          trailing: Text(
-                            currentShow?.status??'',
-                            style: TextStyle(
-                                color: Color(0xff262626),
-                                fontSize: 20
-                            ),
-                          ),
-                        ),
-
-                        Divider(
-                          color: Color(0x889f9d9d),
-                          thickness: 4,
-                          indent: 24,
-                          endIndent: 24,
-                        ),
-
-                        ListTile(
-                          leading: Text(
-                            'Runtime',
-                            style: TextStyle(
-                                color: Color(0xff262626),
-                                fontSize: 20
-                            ),
-                          ),
-
-                          trailing: Text(
-                            '${currentShow?.runtime??''} mins',
-                            style: TextStyle(
-                                color: Color(0xff262626),
-                                fontSize: 20
-                            ),
-                          ),
-                        ),
-
-                        SizedBox(height: 38,),
-
-                        SafeArea(
-                          bottom: true,
-                          child: Padding(
-                            padding: const EdgeInsets.only(bottom: 18),
-                            child: Center(
-                              child: ElevatedButton.icon(
-                                style:  ElevatedButton.styleFrom(
-                                  shape: LinearBorder(),
-                                  fixedSize: Size(MediaQuery.sizeOf(context).width*0.8, 30),
-                                  backgroundColor: isFavorite? Color(0xffdd2b0f) : Color(0xffeae9e9),
-                                  shadowColor: Color(0xffaa210b),
-                                  elevation: 8
-                                ),
-                                icon: Icon(
-                                  Icons.favorite,
-                                  color: isFavorite? Color(0xfff3f2f2) : Color(0xffdd2b0f),
-                                ),
-                                label: Text(
-                                  isFavorite? 'Remove from favorites': 'Add to favorites',
-                                  style: TextStyle(
-                                    color: isFavorite? Color(0xfff3f2f2) : Color(0xffdd2b0f),
-                                  ),
-                                ),
-                                onPressed: (){
-
-
-                                  if(isFavorite) {
-                                    ref.read(favoriteControllerProvider.notifier).removeFavorite(currentShow!);
-                                  } else {
-                                    ref.read(favoriteControllerProvider.notifier).addFavorite(currentShow!);
-                                  }
-                                },
+                  
+                            trailing: Text(
+                              '${currentShow?.daysOfShowing.first??''}, ${currentShow?.timeOfShowing??''}',
+                              style: TextStyle(
+                                  color: Color(0xff262626),
+                                  fontSize: 20
                               ),
                             ),
                           ),
-                        ),
-
-
-
-                      ],
+                  
+                          Divider(
+                            color: Color(0x889f9d9d),
+                            thickness: 4,
+                            indent: 24,
+                            endIndent: 24,
+                          ),
+                  
+                          ListTile(
+                            leading: Text(
+                              'Network',
+                              style: TextStyle(
+                                  color: Color(0xff262626),
+                                  fontSize: 20
+                              ),
+                            ),
+                  
+                            trailing: Text(
+                              currentShow?.network??'',
+                              style: TextStyle(
+                                  color: Color(0xff262626),
+                                  fontSize: 20
+                              ),
+                            ),
+                          ),
+                  
+                          Divider(
+                            color: Color(0x889f9d9d),
+                            thickness: 4,
+                            indent: 24,
+                            endIndent: 24,
+                          ),
+                  
+                          ListTile(
+                            leading: Text(
+                              'Status',
+                              style: TextStyle(
+                                  color: Color(0xff262626),
+                                  fontSize: 20
+                              ),
+                            ),
+                  
+                            trailing: Text(
+                              currentShow?.status??'',
+                              style: TextStyle(
+                                  color: Color(0xff262626),
+                                  fontSize: 20
+                              ),
+                            ),
+                          ),
+                  
+                          Divider(
+                            color: Color(0x889f9d9d),
+                            thickness: 4,
+                            indent: 24,
+                            endIndent: 24,
+                          ),
+                  
+                          ListTile(
+                            leading: Text(
+                              'Runtime',
+                              style: TextStyle(
+                                  color: Color(0xff262626),
+                                  fontSize: 20
+                              ),
+                            ),
+                  
+                            trailing: Text(
+                              '${currentShow?.runtime??''} mins',
+                              style: TextStyle(
+                                  color: Color(0xff262626),
+                                  fontSize: 20
+                              ),
+                            ),
+                          ),
+                  
+                          SizedBox(height: 38,),
+                  
+                          SafeArea(
+                            bottom: true,
+                            child: Padding(
+                              padding: const EdgeInsets.only(bottom: 18),
+                              child: Center(
+                                child: ElevatedButton.icon(
+                                  style:  ElevatedButton.styleFrom(
+                                    shape: LinearBorder(),
+                                    fixedSize: Size(MediaQuery.sizeOf(context).width*0.8, 30),
+                                    backgroundColor: isFavorite? Color(0xffdd2b0f) : Color(0xffeae9e9),
+                                    shadowColor: Color(0xffaa210b),
+                                    elevation: 8
+                                  ),
+                                  icon: Icon(
+                                    Icons.favorite,
+                                    color: isFavorite? Color(0xfff3f2f2) : Color(0xffdd2b0f),
+                                  ),
+                                  label: Text(
+                                    isFavorite? 'Remove from favorites': 'Add to favorites',
+                                    style: TextStyle(
+                                      color: isFavorite? Color(0xfff3f2f2) : Color(0xffdd2b0f),
+                                    ),
+                                  ),
+                                  onPressed: (){
+                  
+                  
+                                    if(isFavorite) {
+                                      ref.read(favoriteControllerProvider.notifier).removeFavorite(currentShow!);
+                                    } else {
+                                      ref.read(favoriteControllerProvider.notifier).addFavorite(currentShow!);
+                                    }
+                                  },
+                                ),
+                              ),
+                            ),
+                          ),
+                  
+                  
+                  
+                        ],
+                      ),
                     ),
                   ),
                 );

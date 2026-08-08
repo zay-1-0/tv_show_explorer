@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_it/get_it.dart';
 import 'package:tv_show_explorer/services/api_service.dart';
 
-import '../classes/show.dart';
+import 'package:tv_show_explorer/classes/show.dart';
 import '../services/database_service.dart';
 
 class FavoritePageController extends AsyncNotifier<void>{

@@ -2,7 +2,7 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../classes/show.dart';
+import 'package:tv_show_explorer/classes/show.dart';
 
 final selectedShowProvider = NotifierProvider<SelectedShow, Show?>(SelectedShow.new);
 

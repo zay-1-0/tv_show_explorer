@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tv_show_explorer/services/api_service.dart';
 import 'package:get_it/get_it.dart';
 
-import '../classes/show.dart';
+import 'package:tv_show_explorer/classes/show.dart';
 
 class SearchPageController extends AsyncNotifier<List<Show>>{
 

@@ -3,7 +3,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_it/get_it.dart';
 
-import '../classes/show.dart';
+import 'package:tv_show_explorer/classes/show.dart';
 import '../services/api_service.dart';
 import '../services/database_service.dart';
 
@@ -17,6 +17,14 @@ final detailPageShowProvider = FutureProvider.family<Show?, int>((ref, showId) a
     Map? map= await apiService.fetchShow(showId);
     if(map!=null) {
       show = Show.fromJson(map);
+    }
+  }
+
+  if (show!.posterURL.isEmpty) {
+    final url = await apiService.fetchPosterUrl(show.showID);
+
+    if (url != null) {
+      show.posterURL = url;
     }
   }
 

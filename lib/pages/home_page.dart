@@ -6,7 +6,7 @@ import 'package:skeletonizer/skeletonizer.dart';
 import 'package:tv_show_explorer/classes/home_page_data.dart';
 import 'package:tv_show_explorer/controllers/home_page_controller.dart';
 
-import '../classes/show.dart';
+import 'package:tv_show_explorer/classes/show.dart';
 
 
 import 'package:tv_show_explorer/widgets/show_list_view.dart';

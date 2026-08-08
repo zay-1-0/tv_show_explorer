@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-import '../classes/show.dart';
+import 'package:tv_show_explorer/classes/show.dart';
 
 class GenreCard extends StatelessWidget{
 
   final Show currShow;
   final bool isDetails;
 
-  const GenreCard({required this.currShow, required this.isDetails});
+  const GenreCard({super.key, required this.currShow, required this.isDetails});
 
   Widget genreCardShow(){
     if(currShow.genres.isNotEmpty) {
@@ -34,8 +34,9 @@ class GenreCard extends StatelessWidget{
 
   Widget genreCardDetials(String genre){
 
-    if(genre=='Science-Fiction')
+    if(genre=='Science-Fiction') {
       genre='Sci-Fi';
+    }
     return Card(
       shape: ContinuousRectangleBorder(
         side: const BorderSide(

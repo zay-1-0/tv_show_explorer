@@ -5,7 +5,7 @@ import 'package:tv_show_explorer/providers/main_page_provider.dart';
 import 'package:tv_show_explorer/widgets/favorite_button.dart';
 import 'package:tv_show_explorer/widgets/genre_card.dart';
 
-import '../classes/show.dart';
+import 'package:tv_show_explorer/classes/show.dart';
 
 class ShowCard extends ConsumerWidget
 {

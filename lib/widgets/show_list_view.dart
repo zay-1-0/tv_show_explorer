@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tv_show_explorer/widgets/show_card.dart';
 
-import '../classes/show.dart';
+import 'package:tv_show_explorer/classes/show.dart';
 
 class ShowListView extends StatelessWidget {
 
@@ -46,11 +46,12 @@ class ShowListView extends StatelessWidget {
             padding: const EdgeInsets.all(50.0),
             child: Center(
               child: Text(
-                  'That\'s everything saved so far',
+                  'That\'s everything you\'ve liked. Go to the home or search page to favorite more shows',
                 style: TextStyle(
                   color: Color(0xff3e1914),
-                  fontSize: 17
+                  fontSize: 17,
                 ),
+                textAlign: TextAlign.center,
               ),
             ),
           );

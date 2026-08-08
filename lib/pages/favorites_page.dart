@@ -19,7 +19,7 @@ class FavoritesPage extends ConsumerWidget {
       data: (shows) => Scaffold(
 
         appBar: AppBar(
-          backgroundColor: Color(0xff7c1405),
+          backgroundColor: Color(0xffec3013),
           title: Text(
             'Favorites',
             style: TextStyle(

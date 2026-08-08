@@ -5,7 +5,7 @@ import 'package:get_it/get_it.dart';
 import 'package:tv_show_explorer/classes/home_page_data.dart';
 import 'package:tv_show_explorer/services/api_service.dart';
 
-import '../classes/show.dart';
+import 'package:tv_show_explorer/classes/show.dart';
 
 class HomePageController extends AsyncNotifier<HomePageData>{
 

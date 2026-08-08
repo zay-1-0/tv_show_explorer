@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../classes/show.dart';
+import 'package:tv_show_explorer/classes/show.dart';
 import '../providers/favorites_provider.dart';
 
 
@@ -17,7 +17,7 @@ class FavoriteButton extends ConsumerWidget {
   final Show show;
 
 
-  FavoriteButton({
+  const FavoriteButton({
     super.key,
     required this.show,
   });

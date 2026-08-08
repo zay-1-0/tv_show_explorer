@@ -68,6 +68,24 @@ class Show{
     );
   }
 
+  factory Show.empty() {
+    return Show(
+      showID: 0,
+      title: 'Unknown Show',
+      imageURL: '',
+      rating: 0,
+      runTimeStart: 0,
+      runTimeEnd: 0,
+      genres: [],
+      summary: '',
+      timeOfShowing: '',
+      daysOfShowing: [],
+      network: '',
+      status: '',
+      runtime: 0,
+    );
+  }
+
   @override
   String toString() {
 

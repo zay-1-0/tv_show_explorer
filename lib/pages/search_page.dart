@@ -1,15 +1,15 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tv_show_explorer/classes/search_page_data.dart';
 
-import 'package:tv_show_explorer/classes/show.dart';
 import 'package:tv_show_explorer/controllers/search_page_conroller.dart';
 
 import 'package:tv_show_explorer/widgets/show_list_view.dart';
 
 
 
-final searchPageControllerProvider= AsyncNotifierProvider<SearchPageController, List<Show>>((){
+final searchPageControllerProvider= AsyncNotifierProvider<SearchPageController, SearchPageData>((){
   return SearchPageController();
 });
 
@@ -68,6 +68,7 @@ class SearchPage extends ConsumerWidget {
                         ),
                         onTap: (){
                           ref.read(searchPageControllerProvider.notifier).onSearchChanged(search);
+                          searchQuery.closeView(search);
                         },
                       )
                       );
@@ -78,51 +79,24 @@ class SearchPage extends ConsumerWidget {
                     ),
                   ),
                   isFullScreen: false,
-                  onChanged: (value){
+                  onSubmitted: (value){
                       ref.read(searchPageControllerProvider.notifier).onSearchChanged(value);
+                      searchQuery.closeView(value);
                   },
+                  onClose: searchQuery.clear,
+                  viewBuilder: (Iterable<Widget> recents){
+                      return ListView.builder(
+                        itemCount: recents.length,
+                        itemBuilder: (context,index){
+                          return recents.elementAt(index);
+                        },
+                        shrinkWrap: true,
+                      );
+                  },
+                  shrinkWrap: true,
+                  viewHintText: 'Recent Searches',
+                  barHintText: 'Type a show\'s name',
                 ),
-              // TextField(
-              //
-              //   controller: searchQuery,
-              //   onChanged: (value){
-              //     ref.read(searchPageControllerProvider.notifier).onSearchChanged(value);
-              //   },
-              //   decoration: InputDecoration(
-              //       focusedBorder: OutlineInputBorder(
-              //         borderSide: BorderSide(
-              //           color: Color(0xff2d2b2b),
-              //           width: 1.5,
-              //         ),
-              //       ),
-              //       enabledBorder: OutlineInputBorder(
-              //         borderSide: BorderSide(
-              //           color: Color(0xff2d2b2b),
-              //           width: 1.5,
-              //         ),
-              //       ),
-              //       hintText: 'Type show\'s name',
-              //       suffixIcon: Icon(
-              //         Icons.search_rounded,
-              //         size: 32,
-              //       ),
-              //       hintStyle: TextStyle(
-              //         color: Color(0xff2d2b2b),
-              //       ),
-              //     fillColor: Colors.white,
-              //     filled: true,
-              //     isDense: true,
-              //     contentPadding: EdgeInsets.symmetric(
-              //       vertical: 4.0,
-              //       horizontal: 10.0,
-              //     ),
-              //   ),
-              //   style: TextStyle(
-              //     color: Color(0xff2d2b2b),
-              //     fontSize: 20
-              //   ),
-              //
-              // ),
             )
         ),
       ),
@@ -133,7 +107,7 @@ class SearchPage extends ConsumerWidget {
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (err, stack) => Center(child: Text('Error searching: $err')),
             data: (searchResults){
-              if(searchResults.isEmpty) {
+              if(searchResults.searchResults.isEmpty) {
                 return Center(
                   child: Text(
                     'Try searching for something',
@@ -147,7 +121,9 @@ class SearchPage extends ConsumerWidget {
               }
 
               return ShowListView(
-                  shows: searchResults,
+                shows: searchResults.searchResults,
+                isSearch: true,
+                query: searchResults.query ,
                 );
 
 
@@ -155,9 +131,6 @@ class SearchPage extends ConsumerWidget {
 
             }
           ),
-
-      //   ],
-      // ),
     );
   }
 }

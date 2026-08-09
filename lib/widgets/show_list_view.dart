@@ -9,11 +9,13 @@ class ShowListView extends StatelessWidget {
   final List<Show> shows;
   final bool? isHome;
   final bool? isFavorite;
+  final bool? isSearch;
+  final String? query;
 
 
 
 
-  const ShowListView({super.key,required this.shows, this.scrollController, this.isHome, this.isFavorite});
+  const ShowListView({super.key,required this.shows, this.scrollController, this.isHome, this.isFavorite, this.isSearch, this.query});
 
   @override
   Widget build(BuildContext context) {
@@ -31,10 +33,41 @@ class ShowListView extends StatelessWidget {
       ),
     ) : ListView.builder(
       controller: scrollController,
-      itemCount: shows.length+1,
+      itemCount: (isSearch??false)? shows.length+2 : shows.length+1,
       itemBuilder: (context,index) {
-        if (index < shows.length) {
-          final show = shows[index];
+        int offset= (isSearch??false)? 1:0;
+        if((isSearch??false)){
+          if(index==0){
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: 6,),
+
+                Text(
+                  'Showing results for: \' ${query!} \' ',
+                  style: TextStyle(
+                    fontSize: 24,
+                    color: Color(0xff2d2b2b),
+                    fontWeight: FontWeight.w400,
+                  ),
+                  textAlign: TextAlign.right,
+                ),
+
+                SizedBox(height: 8,),
+
+                Divider(
+                  color: Color(0xff2d2b2b),
+                  thickness: 4,
+                  indent: 14,
+                  endIndent: 14,
+                ),
+
+              ],
+            );
+          }
+        }
+        if (index < shows.length-offset) {
+          final show = shows[index-offset];
           return ShowCard(currShow: show,);
         } else if (isHome ?? false) {
           return Padding(

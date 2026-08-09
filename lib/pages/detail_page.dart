@@ -235,7 +235,7 @@ class DetailWidget extends ConsumerWidget{
                             ),
                   
                             trailing: Text(
-                              '${currentShow?.daysOfShowing.first??''}, ${currentShow?.timeOfShowing??''}',
+                              '${currentShow?.daysOfShowing.firstOrNull??''}, ${currentShow?.timeOfShowing??''}',
                               style: TextStyle(
                                   color: Color(0xff262626),
                                   fontSize: 20

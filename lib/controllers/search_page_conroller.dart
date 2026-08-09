@@ -3,13 +3,14 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tv_show_explorer/classes/search_page_data.dart';
 
 import 'package:tv_show_explorer/services/api_service.dart';
 import 'package:get_it/get_it.dart';
 
 import 'package:tv_show_explorer/classes/show.dart';
 
-class SearchPageController extends AsyncNotifier<List<Show>>{
+class SearchPageController extends AsyncNotifier<SearchPageData>{
 
   Timer? _debounce;
   String _lastSearchText = '';
@@ -19,10 +20,10 @@ class SearchPageController extends AsyncNotifier<List<Show>>{
 
 
   @override
-  FutureOr<List<Show>> build() {
+  SearchPageData build() {
     ref.onDispose(() => _debounce?.cancel());
     _apiService=_getIt.get<ApiService>();
-    return [];
+    return  SearchPageData(searchResults: [], query: '');
   }
 
   Future<void> onSearchChanged(String query) async {
@@ -36,12 +37,13 @@ class SearchPageController extends AsyncNotifier<List<Show>>{
 
             state = const AsyncValue.loading();
 
-            
+            await saveQuery(query);
+
             state=await AsyncValue.guard(() async {
 
               final results = await _apiService.fetchSearchResults(query);
               final shows = results?.map((r) => Show.fromJson(r['show'])).toList()??[];
-              return shows;
+              return SearchPageData(searchResults: shows, query: query);
 
             });
 

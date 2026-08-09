@@ -2,6 +2,7 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:tv_show_explorer/services/api_service.dart';
 import 'package:get_it/get_it.dart';
@@ -14,6 +15,8 @@ class SearchPageController extends AsyncNotifier<List<Show>>{
   String _lastSearchText = '';
   final GetIt _getIt=GetIt.instance;
   late ApiService _apiService;
+  final String _key = 'recent_searches';
+
 
   @override
   FutureOr<List<Show>> build() {
@@ -49,6 +52,30 @@ class SearchPageController extends AsyncNotifier<List<Show>>{
         }
     );
   }
+
+  Future<List<String>> getHistory() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getStringList(_key) ?? [];
+  }
+
+  Future<void> saveQuery(String query) async {
+    if (query.trim().isEmpty) return;
+
+    final prefs = await SharedPreferences.getInstance();
+    List<String> history = prefs.getStringList(_key) ?? [];
+
+    // Remove duplicates and keep the most recent query at the top
+    history.remove(query);
+    history.insert(0, query);
+
+    // Limit history length (e.g., max 5 items)
+    if (history.length > 5) {
+      history = history.sublist(0, 5);
+    }
+
+    await prefs.setStringList(_key, history);
+  }
+
 
 }
 

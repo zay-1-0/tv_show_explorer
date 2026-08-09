@@ -14,9 +14,9 @@ final searchPageControllerProvider= AsyncNotifierProvider<SearchPageController, 
 });
 
 
-final textQueryProvider = Provider<TextEditingController>((ref) {
-  final controller = TextEditingController();
-  ref.onDispose(() => controller.dispose());
+final textQueryProvider = Provider<SearchController>((ref) {
+  final controller = SearchController();
+  ref.onDispose(controller.dispose);
   return controller;
 });
 
@@ -32,6 +32,7 @@ class SearchPage extends ConsumerWidget {
 
     final searchQuery = ref.watch(textQueryProvider);
     final searchState= ref.watch(searchPageControllerProvider);
+    final recentSearchesNotifier=  ref.watch(searchPageControllerProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(
@@ -56,47 +57,72 @@ class SearchPage extends ConsumerWidget {
             preferredSize: const Size.fromHeight(100),
             child: Padding(
               padding: EdgeInsets.fromLTRB(20, 20, 20, 40),
-              child: TextField(
-
-                controller: searchQuery,
-                onChanged: (value){
-                  ref.read(searchPageControllerProvider.notifier).onSearchChanged(value);
-                },
-                decoration: InputDecoration(
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Color(0xff2d2b2b),
-                        width: 1.5,
-                      ),
+              child:
+                SearchAnchor.bar(
+                    suggestionsBuilder:(context, controller) async
+                    {
+                      final recentSearches=await recentSearchesNotifier.getHistory();
+                      return recentSearches.map((search)=> ListTile(
+                        title: Text(
+                          search
+                        ),
+                        onTap: (){
+                          ref.read(searchPageControllerProvider.notifier).onSearchChanged(search);
+                        },
+                      )
+                      );
+                      },
+                    searchController: searchQuery,
+                    barShape: WidgetStateProperty.all(
+                    StadiumBorder(
                     ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Color(0xff2d2b2b),
-                        width: 1.5,
-                      ),
-                    ),
-                    hintText: 'Type show\'s name',
-                    suffixIcon: Icon(
-                      Icons.search_rounded,
-                      size: 32,
-                    ),
-                    hintStyle: TextStyle(
-                      color: Color(0xff2d2b2b),
-                    ),
-                  fillColor: Colors.white,
-                  filled: true,
-                  isDense: true,
-                  contentPadding: EdgeInsets.symmetric(
-                    vertical: 4.0,
-                    horizontal: 10.0,
                   ),
+                  isFullScreen: false,
+                  onChanged: (value){
+                      ref.read(searchPageControllerProvider.notifier).onSearchChanged(value);
+                  },
                 ),
-                style: TextStyle(
-                  color: Color(0xff2d2b2b),
-                  fontSize: 20
-                ),
-
-              ),
+              // TextField(
+              //
+              //   controller: searchQuery,
+              //   onChanged: (value){
+              //     ref.read(searchPageControllerProvider.notifier).onSearchChanged(value);
+              //   },
+              //   decoration: InputDecoration(
+              //       focusedBorder: OutlineInputBorder(
+              //         borderSide: BorderSide(
+              //           color: Color(0xff2d2b2b),
+              //           width: 1.5,
+              //         ),
+              //       ),
+              //       enabledBorder: OutlineInputBorder(
+              //         borderSide: BorderSide(
+              //           color: Color(0xff2d2b2b),
+              //           width: 1.5,
+              //         ),
+              //       ),
+              //       hintText: 'Type show\'s name',
+              //       suffixIcon: Icon(
+              //         Icons.search_rounded,
+              //         size: 32,
+              //       ),
+              //       hintStyle: TextStyle(
+              //         color: Color(0xff2d2b2b),
+              //       ),
+              //     fillColor: Colors.white,
+              //     filled: true,
+              //     isDense: true,
+              //     contentPadding: EdgeInsets.symmetric(
+              //       vertical: 4.0,
+              //       horizontal: 10.0,
+              //     ),
+              //   ),
+              //   style: TextStyle(
+              //     color: Color(0xff2d2b2b),
+              //     fontSize: 20
+              //   ),
+              //
+              // ),
             )
         ),
       ),

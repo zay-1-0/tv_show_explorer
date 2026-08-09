@@ -9,6 +9,7 @@ import 'package:tv_show_explorer/pages/search_page.dart';
 import 'package:tv_show_explorer/providers/main_page_provider.dart';
 import 'package:tv_show_explorer/services/api_service.dart';
 import 'package:tv_show_explorer/services/database_service.dart';
+import 'package:tv_show_explorer/theme/app_theme.dart';
 
 void main() async {
   await _setup();
@@ -73,6 +74,7 @@ class _MyAppState extends ConsumerState<MyApp> {
 
     return  MaterialApp(
         title: 'TV Show Explorer',
+        theme: AppTheme.light,
         home: PopScope<Object?>(
           canPop: show==null,
           onPopInvokedWithResult: (bool didPop, Object? result) async{
@@ -93,38 +95,21 @@ class _MyAppState extends ConsumerState<MyApp> {
                       _selectedPage = index;
                     });
                   },
+                  // Sizes and colours come from navigationBarTheme.
                   destinations: const [
                     NavigationDestination(
-                      icon: Icon(
-                        Icons.home_filled,
-                        size: 34,
-                      ),
+                      icon: Icon(Icons.home_outlined),
+                      selectedIcon: Icon(Icons.home_filled),
                       label: 'Home',
-                      selectedIcon: Icon(
-                        Icons.home_filled,
-                        size: 34,
-                        color: Color(0xffec3013),
-                      ),
                     ),
                     NavigationDestination(
-                      icon: Icon(
-                        Icons.search,
-                        size: 36,
-                      ),
-                      selectedIcon: Icon(
-                        Icons.search,
-                        size: 36,
-                        color: Color(0xffec3013),
-                      ),
+                      icon: Icon(Icons.search),
+                      selectedIcon: Icon(Icons.search),
                       label: 'Search',
                     ),
                     NavigationDestination(
-                      icon: Icon(Icons.favorite),
-                      selectedIcon: Icon(
-                        Icons.favorite,
-                        size: 36,
-                        color: Color(0xffec3013),
-                      ),
+                      icon: Icon(Icons.favorite_outline),
+                      selectedIcon: Icon(Icons.favorite),
                       label: 'Favorites',
                     ),
                   ],

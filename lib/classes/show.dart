@@ -94,3 +94,45 @@ class Show{
   }
 
 }
+
+extension ShowImages on Show {
+
+  /// TVMaze serves the same upload at several resolutions under a predictable
+  /// path segment, so the list thumbnail can be upgraded without the extra
+  /// `/shows/{id}/images` request that [Show.posterURL] needs.
+  ///
+  /// Callers should fall back to [Show.imageURL] if this URL fails to load.
+  String get bannerURL => imageURL.contains('medium_portrait')
+      ? imageURL.replaceFirst('medium_portrait', 'original_untouched')
+      : imageURL;
+}
+
+extension ShowFormatting on Show {
+
+  /// Streaming shows drop a whole season at once, so TVMaze gives them an
+  /// empty `schedule.days`. Reading `.first` on that throws, so every caller
+  /// must go through here.
+  String get scheduleLabel {
+    if (daysOfShowing.isEmpty) {
+      return timeOfShowing.isEmpty ? 'Streaming' : timeOfShowing;
+    }
+    return timeOfShowing.isEmpty
+        ? daysOfShowing.first
+        : '${daysOfShowing.first}, $timeOfShowing';
+  }
+
+  /// `runTimeEnd` stays 0 while a show is still running, which would otherwise
+  /// render as "2008 - 0".
+  String get yearsLabel {
+    if (runTimeStart == 0) return '';
+    return runTimeEnd == 0
+        ? '$runTimeStart – Present'
+        : '$runTimeStart – $runTimeEnd';
+  }
+
+  String get runtimeLabel => runtime == 0 ? '—' : '$runtime mins';
+
+  String get networkLabel => network.isEmpty ? '—' : network;
+
+  String get statusLabel => status.isEmpty ? '—' : status;
+}

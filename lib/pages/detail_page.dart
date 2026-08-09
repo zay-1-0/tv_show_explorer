@@ -5,7 +5,12 @@ import 'package:readmore/readmore.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:tv_show_explorer/providers/detail_page_provider.dart';
 import 'package:tv_show_explorer/providers/favorites_provider.dart';
-import 'package:tv_show_explorer/widgets/genre_card.dart';
+import 'package:tv_show_explorer/theme/app_colors.dart';
+import 'package:tv_show_explorer/widgets/empty_state_view.dart';
+import 'package:tv_show_explorer/widgets/genre_chip.dart';
+import 'package:tv_show_explorer/widgets/info_card.dart';
+import 'package:tv_show_explorer/widgets/poster_view.dart';
+import 'package:tv_show_explorer/widgets/rating_pill.dart';
 
 import 'package:tv_show_explorer/classes/show.dart';
 
@@ -17,12 +22,12 @@ class DetailWidget extends ConsumerWidget{
 
   const DetailWidget({super.key, required this.showId,});
 
+  /// One inset for every block on the page.
+  static const double _gutter = 20;
 
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
-
 
     final show = ref.watch(detailPageShowProvider(showId));
 
@@ -30,7 +35,16 @@ class DetailWidget extends ConsumerWidget{
       loading: ()  {
         return detailPage(context, null, true, ref);
       },
-      error: (err, stack) => Center(child: Text('Error fetching details: $err')),
+      error: (err, stack) => Scaffold(
+        appBar: AppBar(title: const Text('Show Details')),
+        body: EmptyStateView(
+          icon: Icons.error_outline_rounded,
+          title: 'Couldn\'t load this show',
+          message: 'Check your connection and try again.',
+          actionLabel: 'Retry',
+          onAction: () => ref.invalidate(detailPageShowProvider(showId)),
+        ),
+      ),
       data: (currentShow){
 
        return detailPage(context, currentShow, false, ref);
@@ -52,322 +66,196 @@ class DetailWidget extends ConsumerWidget{
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Show Details',
-          style: const TextStyle(
-            fontSize: 26,
-            color: Color(0xff2d2b2b),
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-
+        title: const Text('Show Details'),
       ),
-          backgroundColor: Color(0xfff3f2f2),
-          body: Skeletonizer(
-            enabled: isLoading,
-            child: LayoutBuilder(
-              builder: (context, viewportConstraints) {
-                return Scrollbar(
-                  scrollbarOrientation: ScrollbarOrientation.right,
-                  thickness: 8,
-                  radius: Radius.circular(18),
-                  child: SingleChildScrollView(
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minHeight: viewportConstraints.maxHeight,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Image.network(
-                            currentShow?.posterURL??'',
-                            height: 200,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, exception, stackTrace) {
-                              return const SizedBox(
-                                height: 200,
-                                child: Center(
-                                  child: Icon(
-                                    Icons.broken_image,
-                                    color: Colors.red,
-                                    size: 50,
-                                  ),
-                                ),
-                              );
-                            },
-                            loadingBuilder:
-                                (
-                                BuildContext context,
-                                Widget child,
-                                ImageChunkEvent? loadingProgress,
-                                ) {
-                              if (loadingProgress == null) {
-                                return child;
-                              }
-                              return Center(
-                                child: CircularProgressIndicator(
-                                  value: loadingProgress.expectedTotalBytes != null
-                                      ? loadingProgress.cumulativeBytesLoaded /
-                                      loadingProgress.expectedTotalBytes!
-                                      : null,
-                                ),
-                              );
-                            },
-                          ),
-                  
-                          IntrinsicHeight(
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8),
-                                child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                  
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(vertical: 10),
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                crossAxisAlignment: CrossAxisAlignment.center,
-                                                children: [
-                  
-                                                  SizedBox(width: 20,),
-                  
-                                                  Expanded(
-                                                    child: Text(
-                                                      currentShow?.title??'',
-                                                      maxLines: 2,
-                                                      style: const TextStyle(
-                                                        fontSize: 26,
-                                                        color: Color(0xff2d2b2b),
-                                                        fontWeight: FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                  ),
-                  
-                                                ],
-                                              ),
-                  
-                                              Padding(
-                                                padding: const EdgeInsets.all(8.0),
-                                                child: Row(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                  
-                                                      SizedBox(width: 8,),
-                  
-                                                      const Icon(
-                                                        Icons.star,
-                                                        color: Color(0xff7c1405),
-                                                      ),
-                                                      const SizedBox(width: 4),
-                                                      Text(
-                                                        currentShow?.rating.toString()??'',
-                                                        style: TextStyle(
-                                                          fontSize: 18,
-                                                          color: Color(0xff7c1405),
-                                                        ),
-                                                      ),
-                                                      const SizedBox(width: 16),
-                                                      Text(
-                                                        '${currentShow?.runTimeStart??''} - ${currentShow?.runTimeEnd??''}',
-                                                        style: TextStyle(
-                                                            fontSize: 18,
-                                                            color: Color(0xff2d2b2b),
-                                                          fontWeight: FontWeight.w500
-                                                        ),
-                                                      ),
-                  
-                                                      Expanded(
-                                                        child: Padding(
-                                                          padding: const EdgeInsets.only(left: 14),
-                                                          child: GenreCard(currShow: currentShow??Show.empty(), isDetails: true),
-                                                        ),
-                                                      )
-                                                    ],
-                                                  ),
-                                              ),
-                  
-                  
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                              ),
-                            ),
-                  
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 26),
-                            child: ReadMoreText(
-                                currentShow?.summary??'',
-                                trimMode: TrimMode.Line,
-                                trimLines: 3,
-                                colorClickableText: Color(0xffdd2b0f),
-                                trimCollapsedText: 'Show more',
-                                trimExpandedText: '\n Show less',
-                                style:  TextStyle(
-                                      fontSize: 20,
-                                      color: Color(0xff2d2b2b),
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                              ),
-                          ),
-                  
-                  
-                          SizedBox(height: 12,),
-                  
-                          Divider(
-                            color: Color(0xff9f9d9d),
-                            thickness: 4,
-                            indent: 14,
-                            endIndent: 14,
-                          ),
-                          ListTile(
-                            leading: Text(
-                              'Schedule',
-                              style: TextStyle(
-                                color: Color(0xff262626),
-                                fontSize: 20
-                              ),
-                            ),
-                  
-                            trailing: Text(
-                              '${currentShow?.daysOfShowing.first??''}, ${currentShow?.timeOfShowing??''}',
-                              style: TextStyle(
-                                  color: Color(0xff262626),
-                                  fontSize: 20
-                              ),
-                            ),
-                          ),
-                  
-                          Divider(
-                            color: Color(0x889f9d9d),
-                            thickness: 4,
-                            indent: 24,
-                            endIndent: 24,
-                          ),
-                  
-                          ListTile(
-                            leading: Text(
-                              'Network',
-                              style: TextStyle(
-                                  color: Color(0xff262626),
-                                  fontSize: 20
-                              ),
-                            ),
-                  
-                            trailing: Text(
-                              currentShow?.network??'',
-                              style: TextStyle(
-                                  color: Color(0xff262626),
-                                  fontSize: 20
-                              ),
-                            ),
-                          ),
-                  
-                          Divider(
-                            color: Color(0x889f9d9d),
-                            thickness: 4,
-                            indent: 24,
-                            endIndent: 24,
-                          ),
-                  
-                          ListTile(
-                            leading: Text(
-                              'Status',
-                              style: TextStyle(
-                                  color: Color(0xff262626),
-                                  fontSize: 20
-                              ),
-                            ),
-                  
-                            trailing: Text(
-                              currentShow?.status??'',
-                              style: TextStyle(
-                                  color: Color(0xff262626),
-                                  fontSize: 20
-                              ),
-                            ),
-                          ),
-                  
-                          Divider(
-                            color: Color(0x889f9d9d),
-                            thickness: 4,
-                            indent: 24,
-                            endIndent: 24,
-                          ),
-                  
-                          ListTile(
-                            leading: Text(
-                              'Runtime',
-                              style: TextStyle(
-                                  color: Color(0xff262626),
-                                  fontSize: 20
-                              ),
-                            ),
-                  
-                            trailing: Text(
-                              '${currentShow?.runtime??''} mins',
-                              style: TextStyle(
-                                  color: Color(0xff262626),
-                                  fontSize: 20
-                              ),
-                            ),
-                          ),
-                  
-                          SizedBox(height: 38,),
-                  
-                          SafeArea(
-                            bottom: true,
-                            child: Padding(
-                              padding: const EdgeInsets.only(bottom: 18),
-                              child: Center(
-                                child: ElevatedButton.icon(
-                                  style:  ElevatedButton.styleFrom(
-                                    shape: LinearBorder(),
-                                    fixedSize: Size(MediaQuery.sizeOf(context).width*0.8, 30),
-                                    backgroundColor: isFavorite? Color(0xffdd2b0f) : Color(0xffeae9e9),
-                                    shadowColor: Color(0xffaa210b),
-                                    elevation: 8
-                                  ),
-                                  icon: Icon(
-                                    Icons.favorite,
-                                    color: isFavorite? Color(0xfff3f2f2) : Color(0xffdd2b0f),
-                                  ),
-                                  label: Text(
-                                    isFavorite? 'Remove from favorites': 'Add to favorites',
-                                    style: TextStyle(
-                                      color: isFavorite? Color(0xfff3f2f2) : Color(0xffdd2b0f),
-                                    ),
-                                  ),
-                                  onPressed: (){
-                  
-                  
-                                    if(isFavorite) {
-                                      ref.read(favoriteControllerProvider.notifier).removeFavorite(currentShow!);
-                                    } else {
-                                      ref.read(favoriteControllerProvider.notifier).addFavorite(currentShow!);
-                                    }
-                                  },
-                                ),
-                              ),
-                            ),
-                          ),
-                  
-                  
-                  
-                        ],
-                      ),
-                    ),
+      body: Skeletonizer(
+        enabled: isLoading,
+        child: LayoutBuilder(
+          builder: (context, viewportConstraints) {
+            return Scrollbar(
+              scrollbarOrientation: ScrollbarOrientation.right,
+              thickness: 8,
+              radius: const Radius.circular(18),
+              child: SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: viewportConstraints.maxHeight,
                   ),
-                );
-              }
-            ),
-          ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+
+                      _hero(currentShow),
+
+                      if (currentShow?.genres.isNotEmpty ?? false)
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(_gutter, 16, _gutter, 0),
+                          child: Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: currentShow!.genres
+                                .map((genre) => GenreChip(label: genre))
+                                .toList(),
+                          ),
+                        ),
+
+                      if ((currentShow?.yearsLabel ?? '').isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(_gutter, 12, _gutter, 0),
+                          child: Text(
+                            currentShow!.yearsLabel,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: AppColors.inkMuted,
+                            ),
+                          ),
+                        ),
+
+                      const Padding(
+                        padding: EdgeInsets.fromLTRB(_gutter, 24, _gutter, 8),
+                        child: Text(
+                          'Overview',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.ink,
+                          ),
+                        ),
+                      ),
+
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: _gutter),
+                        child: ReadMoreText(
+                          currentShow?.summary ?? '',
+                          trimMode: TrimMode.Line,
+                          trimLines: 3,
+                          colorClickableText: AppColors.primary,
+                          trimCollapsedText: 'Show more',
+                          trimExpandedText: '\n Show less',
+                          style: const TextStyle(
+                            fontSize: 15,
+                            height: 1.5,
+                            color: AppColors.inkMuted,
+                          ),
+                        ),
+                      ),
+
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(_gutter, 28, _gutter, 0),
+                        child: InfoCard(
+                          rows: [
+                            InfoRow('Schedule', currentShow?.scheduleLabel ?? ''),
+                            InfoRow('Network', currentShow?.networkLabel ?? ''),
+                            InfoRow('Status', currentShow?.statusLabel ?? ''),
+                            InfoRow('Runtime', currentShow?.runtimeLabel ?? ''),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 32),
+
+                      SafeArea(
+                        bottom: true,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(_gutter, 0, _gutter, 20),
+                          child: SizedBox(
+                            height: 52,
+                            child: FilledButton.icon(
+                              style: FilledButton.styleFrom(
+                                backgroundColor: isFavorite
+                                    ? AppColors.primary
+                                    : AppColors.primary.withValues(alpha: 0.10),
+                                foregroundColor: isFavorite
+                                    ? Colors.white
+                                    : AppColors.primary,
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(999),
+                                ),
+                              ),
+                              icon: Icon(
+                                isFavorite
+                                    ? Icons.favorite
+                                    : Icons.favorite_outline_rounded,
+                              ),
+                              label: Text(
+                                isFavorite
+                                    ? 'Remove from favorites'
+                                    : 'Add to favorites',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              onPressed: currentShow == null ? null : (){
+                                if(isFavorite) {
+                                  ref.read(favoriteControllerProvider.notifier).removeFavorite(currentShow);
+                                } else {
+                                  ref.read(favoriteControllerProvider.notifier).addFavorite(currentShow);
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }
+        ),
+      ),
     );
 
+  }
+
+  /// Poster with the title and rating overlaid, mirroring the show cards so a
+  /// tapped card reads as expanding into this page.
+  Widget _hero(Show? currentShow) {
+    return AspectRatio(
+      aspectRatio: 16 / 9,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+
+          PosterView(
+            url: currentShow?.posterURL ?? '',
+            fallbackUrl: currentShow?.bannerURL,
+            cacheWidth: 1080,
+          ),
+
+          const PosterScrim(),
+
+          Positioned(
+            left: _gutter,
+            right: _gutter,
+            bottom: 16,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Expanded(
+                  child: Text(
+                    currentShow?.title ?? '',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                if ((currentShow?.rating ?? 0) > 0) ...[
+                  const SizedBox(width: 12),
+                  RatingPill(rating: currentShow!.rating),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

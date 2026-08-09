@@ -1,40 +1,21 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tv_show_explorer/classes/show.dart';
+import 'package:tv_show_explorer/theme/app_colors.dart';
 import '../providers/favorites_provider.dart';
-
-
-
-
-
-
-
-
 
 class FavoriteButton extends ConsumerWidget {
   final Show show;
 
-
-  const FavoriteButton({
-    super.key,
-    required this.show,
-  });
-
+  const FavoriteButton({super.key, required this.show});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
-
     final isFavorite = ref.watch(isFavoriteProvider(show.showID));
 
     return IconButton(
-
-      onPressed: (){
-
-
-        if(isFavorite) {
+      onPressed: () {
+        if (isFavorite) {
           ref.read(favoriteControllerProvider.notifier).removeFavorite(show);
         } else {
           ref.read(favoriteControllerProvider.notifier).addFavorite(show);
@@ -42,15 +23,10 @@ class FavoriteButton extends ConsumerWidget {
       },
 
       icon: Icon(
-
-        isFavorite? Icons.favorite : Icons.favorite_outline_rounded,
-        size: 34,
-        color: Color(0xffec3013),
-
+        isFavorite ? Icons.favorite : Icons.favorite_outline_rounded,
+        size: 28,
+        color: AppColors.primary,
       ),
     );
-
-    
-
   }
 }

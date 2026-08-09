@@ -8,8 +8,8 @@ import 'package:tv_show_explorer/controllers/home_page_controller.dart';
 
 import 'package:tv_show_explorer/classes/show.dart';
 
-
-import 'package:tv_show_explorer/widgets/show_list_view.dart';
+import 'package:tv_show_explorer/widgets/empty_state_view.dart';
+import 'package:tv_show_explorer/widgets/show_sliver_list.dart';
 
 
 
@@ -62,9 +62,20 @@ class _HomePageState extends ConsumerState<HomePage> {
 
 
     return _homePageData.when(
-      loading: () =>  homePageWidget(true, [], scrollController),
-      error: (err, stack) => Center(child: Text('Error fetching details: $err')),
-      data: (shows)=> homePageWidget(false, shows.shows, scrollController)
+      loading: () =>  homePageWidget(true, []),
+      error: (err, stack) => _scaffold([
+        SliverFillRemaining(
+          hasScrollBody: false,
+          child: EmptyStateView(
+            icon: Icons.wifi_off_rounded,
+            title: 'Couldn\'t load shows',
+            message: 'Check your connection and try again.',
+            actionLabel: 'Retry',
+            onAction: () => ref.invalidate(homePageControllerProvider),
+          ),
+        ),
+      ]),
+      data: (shows)=> homePageWidget(false, shows.shows)
     );
 
   }
@@ -72,27 +83,29 @@ class _HomePageState extends ConsumerState<HomePage> {
   Widget homePageWidget(
       bool isLoading,
       List<Show> shows,
-      ScrollController scrollController
       ){
+    return _scaffold([
+      Skeletonizer.sliver(
+          enabled: isLoading,
+          child: ShowSliverList(shows: shows, isHome: true,)
+      ),
+    ]);
+
+  }
+
+  Widget _scaffold(List<Widget> bodySlivers){
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Color(0xffec3013),
-          title: Text(
-            'Home — Popular Shows',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 28.0,
+        body: CustomScrollView(
+          controller: scrollController,
+          slivers: [
+            const SliverAppBar.large(
+              title: Text('Popular Shows'),
+              pinned: true,
             ),
-          ),
-        ),
-        body: Skeletonizer(
-            enabled: isLoading,
-            child: ShowListView(shows: shows, scrollController: scrollController,isHome: true,)
+            ...bodySlivers,
+          ],
         )
-
-
     );
-
   }
 }
 

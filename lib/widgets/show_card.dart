@@ -1,139 +1,132 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tv_show_explorer/providers/main_page_provider.dart';
 import 'package:tv_show_explorer/widgets/favorite_button.dart';
-import 'package:tv_show_explorer/widgets/genre_card.dart';
+import 'package:tv_show_explorer/widgets/genre_chip.dart';
+import 'package:tv_show_explorer/widgets/poster_view.dart';
+import 'package:tv_show_explorer/widgets/rating_pill.dart';
 
 import 'package:tv_show_explorer/classes/show.dart';
 
-class ShowCard extends ConsumerWidget
-{
+class ShowCard extends ConsumerWidget {
   final Show currShow;
-  const ShowCard({super.key, required this.currShow,});
+  const ShowCard({super.key, required this.currShow});
+
+  static const double _radius = 20;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
-
-    return showCard(ref, context);
-
-  }
-
-
-
-
-  Widget showCard(
-      WidgetRef ref,
-      BuildContext context
-      ){
-
-    return SizedBox(
-      height: 150,
-      child: InkWell(
-        onTap: () {
-          ref.read(selectedShowProvider.notifier).selectNewShow(currShow);
-        },
-        child: Container(
-
-            decoration: BoxDecoration(
-                border: Border(
-                    bottom: BorderSide(
-                        color: Color(0xffa29e9e),
-                        width: 2
-                    )
-                )
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(_radius),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.18),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
             ),
-
-
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-              crossAxisAlignment: CrossAxisAlignment.center,
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(_radius),
+          child: AspectRatio(
+            aspectRatio: 16 / 9,
+            child: Stack(
+              fit: StackFit.expand,
               children: [
-                SizedBox(
-                  width: MediaQuery.sizeOf(context).width * 0.24,
-                  //height: double.infinity,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4,vertical: 0),
-                    child: Image.network(
-                      currShow.imageURL,
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, exception, stackTrace) {
-                        return const Center(
-                          child: Icon(
-                            Icons.broken_image,
-                            color: Colors.red,
-                            size: 50,
-                          ),
-                        );
+                PosterView(
+                  url: currShow.bannerURL,
+                  fallbackUrl: currShow.imageURL,
+                  cacheWidth: 1080,
+                ),
+
+                const PosterScrim(),
+
+                // Sits above the image so the tap ripple is visible, but below
+                // the favourite button so that keeps its own taps.
+                Positioned.fill(
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () {
+                        ref
+                            .read(selectedShowProvider.notifier)
+                            .selectNewShow(currShow);
                       },
+                      child: const SizedBox.expand(),
                     ),
                   ),
                 ),
 
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                Positioned(
+                  left: 16,
+                  right: 16,
+                  bottom: 14,
+                  child: IgnorePointer(
                     child: Column(
-
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(0, 24, 0, 0),
-                          child: Text(
-                            currShow.title,
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w400,
-                              color: Color(0xff2f0701)
-                            ),
-                            maxLines: 4,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-
-                        const SizedBox(height: 8),
-
                         Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            const Icon(
-                              Icons.star,
-                              color: Color(0xff7c1405),
-                              size: 20,
-                            ),
-                            const SizedBox(width: 2),
-                            Text(
-                              currShow.rating.toString(),
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: Color(0xff7c1405),
-                                fontWeight: FontWeight.w500,
+                            Expanded(
+                              child: Text(
+                                currShow.title,
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
-
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
-                              child: GenreCard(currShow: currShow, isDetails: false),
-                            ),
+                            if (currShow.rating > 0) ...[
+                              const SizedBox(width: 8),
+                              RatingPill(rating: currShow.rating),
+                            ],
                           ],
                         ),
 
-
+                        if (currShow.genres.isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          Wrap(
+                            spacing: 6,
+                            runSpacing: 6,
+                            children: currShow.genres
+                                .take(2)
+                                .map(
+                                  (genre) =>
+                                      GenreChip(label: genre, onDark: true),
+                                )
+                                .toList(),
+                          ),
+                        ],
                       ],
                     ),
                   ),
                 ),
 
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 0, 12, 0),
-                  child: FavoriteButton(
-                    show: currShow,
+                Positioned(
+                  top: 6,
+                  right: 6,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.35),
+                      shape: BoxShape.circle,
+                    ),
+                    child: FavoriteButton(show: currShow),
                   ),
                 ),
               ],
             ),
+          ),
         ),
       ),
     );
   }
+
 }

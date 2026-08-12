@@ -51,6 +51,7 @@ class Show{
     String tempSummary;
     RegExp exp = RegExp(r"<[^>]*>", multiLine: true, caseSensitive: true);
     tempSummary=data['summary']?.replaceAll(exp, '')??'';
+
     return Show(
         showID: data['id']??0,
         title: data['name']??'',
@@ -65,6 +66,24 @@ class Show{
         network:data['network']?['name']?? '',
         status: (int.tryParse((data['ended']?.substring(0, 4)) ?? '') ?? 0)==0 ? 'Running' : 'Ended',
         runtime : data['runtime']?? 0
+    );
+  }
+
+  factory Show.empty() {
+    return Show(
+      showID: 0,
+      title: 'Unknown Show',
+      imageURL: '',
+      rating: 0,
+      runTimeStart: 0,
+      runTimeEnd: 0,
+      genres: [],
+      summary: '',
+      timeOfShowing: '',
+      daysOfShowing: [],
+      network: '',
+      status: '',
+      runtime: 0,
     );
   }
 

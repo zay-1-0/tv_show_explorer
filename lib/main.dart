@@ -56,6 +56,7 @@ class _MyAppState extends ConsumerState<MyApp> {
       ),
       FavoritesPage(
       ),
+
     ];
 
   }
@@ -72,7 +73,15 @@ class _MyAppState extends ConsumerState<MyApp> {
 
     return  MaterialApp(
         title: 'TV Show Explorer',
-        home: Navigator(
+        home: PopScope<Object?>(
+          canPop: show==null,
+          onPopInvokedWithResult: (bool didPop, Object? result) async{
+            if (!didPop && show != null) {
+              ref.read(selectedShowProvider.notifier).deselectShow();
+            }
+
+          },
+          child: Navigator(
           pages: [
             MaterialPage(
               key: const ValueKey('MainPage'),
@@ -84,17 +93,59 @@ class _MyAppState extends ConsumerState<MyApp> {
                       _selectedPage = index;
                     });
                   },
+                  labelTextStyle: WidgetStateProperty.resolveWith<TextStyle?>((states) {
+                    if (states.contains(WidgetState.selected)) {
+                      return const TextStyle(
+                        color: Color(0xffec3013),
+                        fontSize: 16
+                      );
+                    }
+                    return const TextStyle(
+                        color: Color(0xff49454f),
+                        fontSize: 16
+                    );
+                  }),
+                  indicatorColor: Color(0xfff4dfd7),
+                  indicatorShape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                  ),
+
                   destinations: const [
                     NavigationDestination(
-                      icon: Icon(Icons.home_filled),
+                      icon: Icon(
+                        Icons.home_outlined,
+                        size: 32,
+                      ),
                       label: 'Home',
+                      selectedIcon: Icon(
+                        Icons.home_filled,
+                        size: 32,
+                        color: Color(0xffec3013),
+                      ),
                     ),
                     NavigationDestination(
-                      icon: Icon(Icons.search),
+                      icon: Icon(
+                        Icons.search,
+                        size: 34,
+                      ),
+                      selectedIcon: Icon(
+                        Icons.search,
+                        size: 34,
+                        color: Color(0xffec3013),
+                      ),
                       label: 'Search',
+
                     ),
                     NavigationDestination(
-                      icon: Icon(Icons.favorite),
+                      icon: Icon(
+                          Icons.favorite_outline_rounded,
+                        size: 34,
+                      ),
+                      selectedIcon: Icon(
+                        Icons.favorite,
+                        size: 34,
+                        color: Color(0xffec3013),
+                      ),
                       label: 'Favorites',
                     ),
                   ],
@@ -110,6 +161,7 @@ class _MyAppState extends ConsumerState<MyApp> {
               MaterialPage(
                 key: const ValueKey('DetailsPage'),
                 child: DetailWidget(showId: show.showID,),
+
               ),
           ],
           onDidRemovePage: (page) {
@@ -118,6 +170,7 @@ class _MyAppState extends ConsumerState<MyApp> {
             }
           },
         ),
+      )
       )
     ;
   }

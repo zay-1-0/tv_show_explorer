@@ -6,7 +6,7 @@ import 'package:skeletonizer/skeletonizer.dart';
 import 'package:tv_show_explorer/classes/home_page_data.dart';
 import 'package:tv_show_explorer/controllers/home_page_controller.dart';
 
-import '../classes/show.dart';
+import 'package:tv_show_explorer/classes/show.dart';
 
 
 import 'package:tv_show_explorer/widgets/show_list_view.dart';
@@ -76,7 +76,7 @@ class _HomePageState extends ConsumerState<HomePage> {
       ){
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.blue,
+          backgroundColor: Color(0xffec3013),
           title: Text(
             'Home — Popular Shows',
             style: TextStyle(

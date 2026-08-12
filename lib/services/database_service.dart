@@ -1,6 +1,6 @@
 import 'package:isar_community/isar.dart';
 import 'package:path_provider/path_provider.dart';
-import '../classes/show.dart';
+import 'package:tv_show_explorer/classes/show.dart';
 
 class DatabaseService {
 
@@ -34,31 +34,10 @@ class DatabaseService {
 
   }
 
-
-  Future<void> putShowsinDatabase(List<Show> showsToAdd) async {
-
-    final List<Id> incomingIds = showsToAdd.map((show) => show.showID).toList();
-
-    final List<Show?> existingShows = await db.shows.getAll(incomingIds);
-
-    final Set<Id> existingIds = existingShows
-        .where((show) => show != null)
-        .map((show) => show!.showID)
-        .toSet();
-
-    final List<Show> showsToInsert = showsToAdd
-        .where((show) => !existingIds.contains(show.showID))
-        .toList();
-
-    await DatabaseService.db.writeTxn(() async {
-      db.shows.putAll(showsToInsert);
-    });
-  }
-
   Stream<List<Show>> getFavoritesStream(){
 
     return db.shows
-        .filter().isFavoriteEqualTo(true)
+        .where()
         .watch(fireImmediately: true);
   }
 
@@ -68,6 +47,19 @@ class DatabaseService {
       fireImmediately: true,
     );
   }
+
+  Future<void> deleteShow(Show show) async {
+    await db.writeTxn(() async {
+      await db.shows.delete(show.showID);
+    });
+  }
+
+  Stream<bool> watchIsFavorite(int showId) {
+    return db.shows
+        .watchObject(showId, fireImmediately: true)
+        .map((show) => show != null);
+  }
+
 
 
 }

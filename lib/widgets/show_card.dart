@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tv_show_explorer/providers/main_page_provider.dart';
 import 'package:tv_show_explorer/widgets/favorite_button.dart';
+import 'package:tv_show_explorer/widgets/genre_card.dart';
 
-import '../classes/show.dart';
+import 'package:tv_show_explorer/classes/show.dart';
 
 class ShowCard extends ConsumerWidget
 {
@@ -15,83 +16,130 @@ class ShowCard extends ConsumerWidget
   Widget build(BuildContext context, WidgetRef ref) {
 
 
-    return SizedBox(
-      height: 280,
+    return showCard(ref, context);
+
+  }
+
+
+
+
+  Widget showCard(
+      WidgetRef ref,
+      BuildContext context
+      ){
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 6),
       child: InkWell(
         onTap: () {
-            ref.read(selectedShowProvider.notifier).selectNewShow(currShow);
+          ref.read(selectedShowProvider.notifier).selectNewShow(currShow);
         },
-        child: Card(
-          color: Colors.indigoAccent[100],
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  width: MediaQuery.sizeOf(context).width * 0.4,
-                  height: double.infinity,
+        child: Container(
+          height: 220,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: const Color(0x306E6EFF),
+              width: 2,
+            ),
+            gradient: const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color(0xfffffdfa),
+                Color(0xfff2d8cf),
+              ],
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.13),
+                blurRadius: 5,
+                offset: const Offset(4, 8),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                width: MediaQuery.sizeOf(context).width * 0.34,
+                height: double.infinity,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6,vertical: 12),
                   child: Image.network(
                     currShow.imageURL,
-                    fit: BoxFit.cover,
+                    fit: BoxFit.contain,
                     errorBuilder: (context, exception, stackTrace) {
                       return const Center(
                         child: Icon(
                           Icons.broken_image,
                           color: Colors.red,
-                          size: 50,
+                          size: 80,
                         ),
                       );
-                    },
+                      },
                   ),
                 ),
+              ),
 
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          currShow.title,
-                          style: const TextStyle(
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+
+                      SizedBox(height: 26,),
+
+                      Text(
+                        currShow.title,
+                        style: const TextStyle(
                             fontSize: 20,
-                            fontWeight: FontWeight.w400,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xff2f0701)
+                        ),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+
+                      const SizedBox(height: 4),
+
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.star,
+                            color: Color(0xff7c1405),
+                            size: 22,
                           ),
-                          maxLines: 4,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-
-                        const SizedBox(height: 8),
-
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.star,
-                              color: Colors.amberAccent,
-                              size: 30,
+                          const SizedBox(width: 2),
+                          Text(
+                            currShow.rating.toString(),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: Color(0xff7c1405),
+                              fontWeight: FontWeight.w500,
                             ),
-                            const SizedBox(width: 4),
-                            Text(
-                              currShow.rating.toString(),
-                              style: const TextStyle(
-                                fontSize: 20,
-                                color: Colors.amberAccent,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                          ),
+                        ],
+                      ),
+
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: GenreCard(currShow: currShow, isDetails: false),
+                      ),
+                    ],
                   ),
                 ),
+              ),
 
-                FavoriteButton(
-                  showId: currShow.showID,
+              Transform.translate(
+                offset: Offset(-14, 18),
+                child: FavoriteButton(
+                  show: currShow,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

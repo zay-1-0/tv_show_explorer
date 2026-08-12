@@ -9,12 +9,12 @@ class ApiService {
   static const String baseUrl='api.tvmaze.com';
 
 
-  static Future<Map?> fetchShow(int id) async {
+  Future<Map?> fetchShow(int id) async {
 
     Uri showUrl=Uri.https(baseUrl, 'shows/$id');
-    Response urlReponse=await get(showUrl);
-    if(urlReponse.statusCode==200) {
-      final data = jsonDecode(urlReponse.body);
+    Response urlResponse=await get(showUrl);
+    if(urlResponse.statusCode==200) {
+      final data = jsonDecode(urlResponse.body);
       return data;
     }else{
       return null;

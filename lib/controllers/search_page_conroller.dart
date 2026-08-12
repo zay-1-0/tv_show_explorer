@@ -26,7 +26,7 @@ class SearchPageController extends AsyncNotifier<SearchPageData>{
     return  SearchPageData(searchResults: [], query: '');
   }
 
-  Future<void> onSearchChanged(String query) async {
+  Future<void> onSearchChanged(String query, bool isSubmitted) async {
 
     if(_debounce?.isActive?? false)_debounce?.cancel();
     _debounce=Timer(const Duration(milliseconds: 400),
@@ -37,7 +37,9 @@ class SearchPageController extends AsyncNotifier<SearchPageData>{
 
             state = const AsyncValue.loading();
 
-            await saveQuery(query);
+            if(isSubmitted) {
+              await saveQuery(query);
+            }
 
             state=await AsyncValue.guard(() async {
 

@@ -44,7 +44,7 @@ class FavoriteButton extends ConsumerWidget {
       icon: Icon(
 
         isFavorite? Icons.favorite : Icons.favorite_outline_rounded,
-        size: 34,
+        size: 38,
         color: Color(0xffec3013),
 
       ),

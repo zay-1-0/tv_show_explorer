@@ -52,17 +52,20 @@ class DetailWidget extends ConsumerWidget{
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Show Details',
-          style: const TextStyle(
-            fontSize: 26,
-            color: Color(0xff2d2b2b),
-            fontWeight: FontWeight.bold,
+        backgroundColor: Color(0xfffff0ed),
+        leading: Transform.translate(
+          offset: const Offset(0, -12),
+          child: const BackButton(
+            color: Colors.black,
+            style: ButtonStyle(
+              iconSize: WidgetStatePropertyAll(24),
+            ),
           ),
         ),
-
+        toolbarHeight: 24,
       ),
-          backgroundColor: Color(0xfff3f2f2),
+
+          backgroundColor: Color(0xfffff0ed),
           body: Skeletonizer(
             enabled: isLoading,
             child: LayoutBuilder(
@@ -79,128 +82,136 @@ class DetailWidget extends ConsumerWidget{
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Image.network(
-                            currentShow?.posterURL??'',
-                            height: 200,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, exception, stackTrace) {
-                              return const SizedBox(
-                                height: 200,
-                                child: Center(
-                                  child: Icon(
-                                    Icons.broken_image,
-                                    color: Colors.red,
-                                    size: 50,
-                                  ),
-                                ),
-                              );
-                            },
-                            loadingBuilder:
-                                (
-                                BuildContext context,
-                                Widget child,
-                                ImageChunkEvent? loadingProgress,
-                                ) {
-                              if (loadingProgress == null) {
-                                return child;
-                              }
-                              return Center(
-                                child: CircularProgressIndicator(
-                                  value: loadingProgress.expectedTotalBytes != null
-                                      ? loadingProgress.cumulativeBytesLoaded /
-                                      loadingProgress.expectedTotalBytes!
-                                      : null,
-                                ),
-                              );
-                            },
-                          ),
-                  
-                          IntrinsicHeight(
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8),
-                                child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                  
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(vertical: 10),
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                crossAxisAlignment: CrossAxisAlignment.center,
-                                                children: [
-                  
-                                                  SizedBox(width: 20,),
-                  
-                                                  Expanded(
-                                                    child: Text(
-                                                      currentShow?.title??'',
-                                                      maxLines: 2,
-                                                      style: const TextStyle(
-                                                        fontSize: 26,
-                                                        color: Color(0xff2d2b2b),
-                                                        fontWeight: FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                  ),
-                  
-                                                ],
-                                              ),
-                  
-                                              Padding(
-                                                padding: const EdgeInsets.all(8.0),
-                                                child: Row(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                  
-                                                      SizedBox(width: 8,),
-                  
-                                                      const Icon(
-                                                        Icons.star,
-                                                        color: Color(0xff7c1405),
-                                                      ),
-                                                      const SizedBox(width: 4),
-                                                      Text(
-                                                        currentShow?.rating.toString()??'',
-                                                        style: TextStyle(
-                                                          fontSize: 18,
-                                                          color: Color(0xff7c1405),
-                                                        ),
-                                                      ),
-                                                      const SizedBox(width: 16),
-                                                      Text(
-                                                        '${currentShow?.runTimeStart??''} - ${currentShow?.runTimeEnd??''}',
-                                                        style: TextStyle(
-                                                            fontSize: 18,
-                                                            color: Color(0xff2d2b2b),
-                                                          fontWeight: FontWeight.w500
-                                                        ),
-                                                      ),
-                  
-                                                      Expanded(
-                                                        child: Padding(
-                                                          padding: const EdgeInsets.only(left: 14),
-                                                          child: GenreCard(currShow: currentShow??Show.empty(), isDetails: true),
-                                                        ),
-                                                      )
-                                                    ],
-                                                  ),
-                                              ),
-                  
-                  
-                                            ],
-                                          ),
+                          SafeArea(
+                            child: SizedBox(
+                              height: MediaQuery.sizeOf(context).height*0.3,
+                              child: Stack(
+                                fit: StackFit.expand,
+                                children: [
+                                  Image.network(
+                                  currentShow?.posterURL??'',
+                                  fit: BoxFit.fill,
+                                  errorBuilder: (context, exception, stackTrace) {
+                                    return const SizedBox(
+                                      height: 200,
+                                      child: Center(
+                                        child: Icon(
+                                          Icons.broken_image,
+                                          color: Colors.red,
+                                          size: 50,
                                         ),
                                       ),
-                                    ],
+                                    );
+                                  },
+                                  loadingBuilder:
+                                      (
+                                      BuildContext context,
+                                      Widget child,
+                                      ImageChunkEvent? loadingProgress,
+                                      ) {
+                                    if (loadingProgress == null) {
+                                      return child;
+                                    }
+                                    return Center(
+                                      child: CircularProgressIndicator(
+                                        value: loadingProgress.expectedTotalBytes != null
+                                            ? loadingProgress.cumulativeBytesLoaded /
+                                            loadingProgress.expectedTotalBytes!
+                                            : null,
+                                      ),
+                                    );
+                                  },
+                                ),
+
+                                  DecoratedBox(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.bottomCenter,
+                                        end: Alignment.center,
+                                        colors: [
+                                          Color(0xd9000000),
+                                          Color(0x73000000),
+                                          Color(0x00000000),
+                                        ],
+                                      ),
+                                    ),
                                   ),
+                            
+                                  Positioned(
+                                    left: 14,
+                                    bottom: 16,
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          currentShow?.title ?? '',
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                            fontSize: 32,
+                                            fontWeight: FontWeight.w700,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+
+                                        Text(
+                                          '${currentShow?.runTimeStart ?? ''}${(currentShow?.runTimeEnd ?? 0) != 0 ? ' - ${currentShow?.runTimeEnd}' : ''}',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w700,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                            
+                            
+                                  Positioned(
+                                    left: MediaQuery.sizeOf(context).width*0.8,
+                                    bottom: 20,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        //color: Colors.black26.withValues(alpha: 0.45),
+                                        borderRadius: BorderRadius.circular(999),
+                                        border: Border.all(color: Colors.white.withValues(alpha: 0.45)),
+                                        gradient: LinearGradient(
+                                          begin: Alignment.bottomCenter,
+                                          end: Alignment.topCenter,
+                                          colors: [
+                                            Colors.black.withValues(alpha: 0.05),
+                                            Colors.black.withValues(alpha: 0.4),
+                                            Colors.black.withValues(alpha: 0.6),
+                                          ],
+                                        ),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          const Icon(
+                                            Icons.star,
+                                            color: Color(0xfff3f2f2),
+                                          ),
+                                         SizedBox(width: 4,),
+                                          Text(
+                                            currentShow?.rating.toString()??'',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                color: Color(0xfff3f2f2),
+                                                fontWeight: FontWeight.w500
+                                            ),
+                                         ),
+                                        ],
+                                      ),
+                                    ),
+                                  )
+                                ],
                               ),
                             ),
+                          ),
                   
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 26),
+                            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
                             child: ReadMoreText(
                                 currentShow?.summary??'',
                                 trimMode: TrimMode.Line,
@@ -215,111 +226,169 @@ class DetailWidget extends ConsumerWidget{
                                     ),
                               ),
                           ),
+
+                          Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+                              child: GenreCard(currShow: currentShow??Show.empty(), isDetails: true),
+                            ),
+
                   
                   
-                          SizedBox(height: 12,),
-                  
-                          Divider(
-                            color: Color(0xff9f9d9d),
-                            thickness: 4,
-                            indent: 14,
-                            endIndent: 14,
-                          ),
-                          ListTile(
-                            leading: Text(
-                              'Schedule',
-                              style: TextStyle(
-                                color: Color(0xff262626),
-                                fontSize: 20
+                          SizedBox(height: 24,),
+
+
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 24),
+                            child: Container(
+                              padding: EdgeInsets.symmetric(horizontal: 12,vertical: 12),
+                              width: MediaQuery.sizeOf(context).width*0.5,
+                              decoration: BoxDecoration(
+                                color: Color(0xfffffbfa),
+                                border: Border.all(
+                                  width: 2,
+                                  color: Color(0x306E6EFF),
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow:[
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.08),
+                                    blurRadius: 10,
+                                    spreadRadius: 1,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                children: [
+                                  Card(
+                                      color: Color(0xfffffbfa),
+                                      elevation: 0,
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            'Schedule',
+                                            style: TextStyle(
+                                                color: Color(0xff262626),
+                                                fontSize: 14
+                                            ),
+                                          ),
+
+                                          Text(
+                                            '${currentShow?.daysOfShowing.firstOrNull??''}, ${currentShow?.timeOfShowing??''}',
+                                            style: TextStyle(
+                                                color: Color(0xff262626),
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w500
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                  ),
+
+                                  Divider(
+                                    color: Color(0x889f9d9d),
+                                    thickness: 4,
+                                  ),
+
+                                  Card(
+                                    color: Color(0xfffffbfa),
+                                    elevation: 0,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          'Network',
+                                          style: TextStyle(
+                                            color: Color(0xff262626),
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        Text(
+                                          currentShow?.network ?? '-',
+                                          style: TextStyle(
+                                            color: Color(0xff262626),
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w500
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+
+                                  Divider(
+                                    color: Color(0x889f9d9d),
+                                    thickness: 4,
+
+                                  ),
+
+                                  Card(
+                                    color: Color(0xfffffbfa),
+                                    elevation: 0,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          'Status',
+                                          style: TextStyle(
+                                              color: Color(0xff262626),
+                                              fontSize: 14
+                                          ),
+                                        ),
+
+                                        Text(
+                                          currentShow?.status??'',
+                                          style: TextStyle(
+                                              color: Color(0xff262626),
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w500
+
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+
+                                  Divider(
+                                    color: Color(0x889f9d9d),
+                                    thickness: 4,
+
+                                  ),
+
+                                  Card(
+                                    color: Color(0xfffffbfa),
+                                    elevation: 0,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          'Runtime',
+                                          style: TextStyle(
+                                              color: Color(0xff262626),
+                                              fontSize: 14
+                                          ),
+                                        ),
+
+                                        Text(
+                                            (currentShow?.runtime != null && currentShow!.runtime != 0) ? '${currentShow.runtime} mins' : '',
+                                          style: TextStyle(
+                                              color: Color(0xff262626),
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w500
+
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+
+                                ],
                               ),
                             ),
-                  
-                            trailing: Text(
-                              '${currentShow?.daysOfShowing.firstOrNull??''}, ${currentShow?.timeOfShowing??''}',
-                              style: TextStyle(
-                                  color: Color(0xff262626),
-                                  fontSize: 20
-                              ),
-                            ),
                           ),
-                  
-                          Divider(
-                            color: Color(0x889f9d9d),
-                            thickness: 4,
-                            indent: 24,
-                            endIndent: 24,
-                          ),
-                  
-                          ListTile(
-                            leading: Text(
-                              'Network',
-                              style: TextStyle(
-                                  color: Color(0xff262626),
-                                  fontSize: 20
-                              ),
-                            ),
-                  
-                            trailing: Text(
-                              currentShow?.network??'',
-                              style: TextStyle(
-                                  color: Color(0xff262626),
-                                  fontSize: 20
-                              ),
-                            ),
-                          ),
-                  
-                          Divider(
-                            color: Color(0x889f9d9d),
-                            thickness: 4,
-                            indent: 24,
-                            endIndent: 24,
-                          ),
-                  
-                          ListTile(
-                            leading: Text(
-                              'Status',
-                              style: TextStyle(
-                                  color: Color(0xff262626),
-                                  fontSize: 20
-                              ),
-                            ),
-                  
-                            trailing: Text(
-                              currentShow?.status??'',
-                              style: TextStyle(
-                                  color: Color(0xff262626),
-                                  fontSize: 20
-                              ),
-                            ),
-                          ),
-                  
-                          Divider(
-                            color: Color(0x889f9d9d),
-                            thickness: 4,
-                            indent: 24,
-                            endIndent: 24,
-                          ),
-                  
-                          ListTile(
-                            leading: Text(
-                              'Runtime',
-                              style: TextStyle(
-                                  color: Color(0xff262626),
-                                  fontSize: 20
-                              ),
-                            ),
-                  
-                            trailing: Text(
-                              '${currentShow?.runtime??''} mins',
-                              style: TextStyle(
-                                  color: Color(0xff262626),
-                                  fontSize: 20
-                              ),
-                            ),
-                          ),
-                  
-                          SizedBox(height: 38,),
-                  
+
+                          SizedBox(height: 52,),
+
                           SafeArea(
                             bottom: true,
                             child: Padding(
@@ -327,9 +396,9 @@ class DetailWidget extends ConsumerWidget{
                               child: Center(
                                 child: ElevatedButton.icon(
                                   style:  ElevatedButton.styleFrom(
-                                    shape: LinearBorder(),
-                                    fixedSize: Size(MediaQuery.sizeOf(context).width*0.8, 30),
-                                    backgroundColor: isFavorite? Color(0xffdd2b0f) : Color(0xffeae9e9),
+                                    shape: StadiumBorder(),
+                                    fixedSize: Size(MediaQuery.sizeOf(context).width*0.75, 30),
+                                    backgroundColor: isFavorite? Color(0xffdd2b0f) : Color(0xfffffbfa),
                                     shadowColor: Color(0xffaa210b),
                                     elevation: 8
                                   ),

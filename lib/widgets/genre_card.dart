@@ -11,12 +11,17 @@ class GenreCard extends StatelessWidget{
 
   Widget genreCardShow(){
     if(currShow.genres.isNotEmpty) {
-      return Card(
-        shape: ContinuousRectangleBorder(
-          side: const BorderSide(
-            color: Color(0xFFec3013), // Your chosen border color
-            width: 2.0,          // Border thickness
+      return Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 4,
+          vertical: 3,
+        ),
+        decoration: BoxDecoration(
+          color: const Color(0xfffff5f2),
+          border: Border.all(
+            color: const Color(0xffff4a3a),
           ),
+          borderRadius: BorderRadius.circular(4),
         ),
         child: Padding(
           padding: const EdgeInsets.all(4.0),
@@ -38,14 +43,16 @@ class GenreCard extends StatelessWidget{
       genre='Sci-Fi';
     }
     return Card(
-      shape: ContinuousRectangleBorder(
+      color: Color(0xfffbf7f7),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadiusGeometry.circular(20),
         side: const BorderSide(
           color: Color(0xFFec3013),
           width: 2.0,
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(4.0),
+        padding: const EdgeInsets.all(8.0),
         child: Text(
           genre,
           style: TextStyle(

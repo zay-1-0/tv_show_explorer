@@ -93,36 +93,57 @@ class _MyAppState extends ConsumerState<MyApp> {
                       _selectedPage = index;
                     });
                   },
+                  labelTextStyle: WidgetStateProperty.resolveWith<TextStyle?>((states) {
+                    if (states.contains(WidgetState.selected)) {
+                      return const TextStyle(
+                        color: Color(0xffec3013),
+                        fontSize: 16
+                      );
+                    }
+                    return const TextStyle(
+                        color: Color(0xff49454f),
+                        fontSize: 16
+                    );
+                  }),
+                  indicatorColor: Color(0xfff4dfd7),
+                  indicatorShape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                  ),
+
                   destinations: const [
                     NavigationDestination(
                       icon: Icon(
-                        Icons.home_filled,
-                        size: 34,
+                        Icons.home_outlined,
+                        size: 32,
                       ),
                       label: 'Home',
                       selectedIcon: Icon(
                         Icons.home_filled,
-                        size: 34,
+                        size: 32,
                         color: Color(0xffec3013),
                       ),
                     ),
                     NavigationDestination(
                       icon: Icon(
                         Icons.search,
-                        size: 36,
+                        size: 34,
                       ),
                       selectedIcon: Icon(
                         Icons.search,
-                        size: 36,
+                        size: 34,
                         color: Color(0xffec3013),
                       ),
                       label: 'Search',
+
                     ),
                     NavigationDestination(
-                      icon: Icon(Icons.favorite),
+                      icon: Icon(
+                          Icons.favorite_outline_rounded,
+                        size: 34,
+                      ),
                       selectedIcon: Icon(
                         Icons.favorite,
-                        size: 36,
+                        size: 34,
                         color: Color(0xffec3013),
                       ),
                       label: 'Favorites',

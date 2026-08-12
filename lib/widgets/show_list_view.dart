@@ -21,17 +21,61 @@ class ShowListView extends StatelessWidget {
   Widget build(BuildContext context) {
 
     return (shows.isEmpty && (isFavorite??false))? Center(
-      child: Padding(
-        padding: const EdgeInsets.all(50.0),
-        child: Text('No Favorites. Go to the Home page or search Page to find some shows you may like',
-          style: TextStyle(
-              fontSize: 26,
-              color: Colors.black,
-              fontWeight: FontWeight.w400
-          ),
-        ),
-      ),
-    ) : ListView.builder(
+        child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+            child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    height: 112,
+                    width: 112,
+                    decoration: BoxDecoration(
+                      color: Color(0xff2d2b2b).withValues(alpha: 0.10),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.favorite_border, size: 68, color: Color(0xffec3013)),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  Text(
+                    'No favorites yet',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xffec3013),
+                      shadows: [
+                        Shadow(
+                          color: Color(0x30000000),
+                          offset: Offset(0, 1),
+                          blurRadius: 2,
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  Text(
+                    'Go to the Home page or search Page to find some shows you may like',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      height: 1.4,
+                      color: Color(0xffec3013),
+                      shadows: [
+                        Shadow(
+                          color: Color(0x30000000),
+                          offset: Offset(0, 1),
+                          blurRadius: 2,
+                        ),
+                      ],
+                    ),
+                  ),
+                ]
+            )
+        )
+    )
+     : ListView.builder(
       controller: scrollController,
       itemCount: (isSearch??false)? shows.length+2 : shows.length+1,
       itemBuilder: (context,index) {

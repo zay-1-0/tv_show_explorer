@@ -28,110 +28,119 @@ class ShowCard extends ConsumerWidget
       BuildContext context
       ){
 
-    return SizedBox(
-      height: 150,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 6),
       child: InkWell(
         onTap: () {
           ref.read(selectedShowProvider.notifier).selectNewShow(currShow);
         },
         child: Container(
-
-            decoration: BoxDecoration(
-                border: Border(
-                    bottom: BorderSide(
-                        color: Color(0xffa29e9e),
-                        width: 2
-                    )
-                )
+          height: 220,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: const Color(0x306E6EFF),
+              width: 2,
             ),
-
-
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: MediaQuery.sizeOf(context).width * 0.24,
-                  //height: double.infinity,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4,vertical: 0),
-                    child: Image.network(
-                      currShow.imageURL,
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, exception, stackTrace) {
-                        return const Center(
-                          child: Icon(
-                            Icons.broken_image,
-                            color: Colors.red,
-                            size: 50,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Column(
-
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(0, 24, 0, 0),
-                          child: Text(
-                            currShow.title,
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w400,
-                              color: Color(0xff2f0701)
-                            ),
-                            maxLines: 4,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-
-                        const SizedBox(height: 8),
-
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.star,
-                              color: Color(0xff7c1405),
-                              size: 20,
-                            ),
-                            const SizedBox(width: 2),
-                            Text(
-                              currShow.rating.toString(),
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: Color(0xff7c1405),
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
-                              child: GenreCard(currShow: currShow, isDetails: false),
-                            ),
-                          ],
-                        ),
-
-
-                      ],
-                    ),
-                  ),
-                ),
-
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 0, 12, 0),
-                  child: FavoriteButton(
-                    show: currShow,
-                  ),
-                ),
+            gradient: const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color(0xfffffdfa),
+                Color(0xfff2d8cf),
               ],
             ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.13),
+                blurRadius: 5,
+                offset: const Offset(4, 8),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                width: MediaQuery.sizeOf(context).width * 0.34,
+                height: double.infinity,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6,vertical: 12),
+                  child: Image.network(
+                    currShow.imageURL,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, exception, stackTrace) {
+                      return const Center(
+                        child: Icon(
+                          Icons.broken_image,
+                          color: Colors.red,
+                          size: 80,
+                        ),
+                      );
+                      },
+                  ),
+                ),
+              ),
+
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+
+                      SizedBox(height: 26,),
+
+                      Text(
+                        currShow.title,
+                        style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xff2f0701)
+                        ),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+
+                      const SizedBox(height: 4),
+
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.star,
+                            color: Color(0xff7c1405),
+                            size: 22,
+                          ),
+                          const SizedBox(width: 2),
+                          Text(
+                            currShow.rating.toString(),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: Color(0xff7c1405),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: GenreCard(currShow: currShow, isDetails: false),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              Transform.translate(
+                offset: Offset(-14, 18),
+                child: FavoriteButton(
+                  show: currShow,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
